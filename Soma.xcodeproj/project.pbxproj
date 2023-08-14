@@ -8,8 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4A7CA7FF2A8AEC0100960D2F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7CA7FE2A8AEC0100960D2F /* AppDelegate.swift */; };
-		4A7CA8012A8AEC0100960D2F /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 4A7CA8002A8AEC0100960D2F /* art.scnassets */; };
-		4A7CA8032A8AEC0100960D2F /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7CA8022A8AEC0100960D2F /* GameViewController.swift */; };
+		4A7CA8032A8AEC0100960D2F /* SomaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7CA8022A8AEC0100960D2F /* SomaViewController.swift */; };
 		4A7CA8062A8AEC0100960D2F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A7CA8042A8AEC0100960D2F /* Main.storyboard */; };
 		4A7CA8082A8AEC0300960D2F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4A7CA8072A8AEC0300960D2F /* Assets.xcassets */; };
 		4A7CA80B2A8AEC0300960D2F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A7CA8092A8AEC0300960D2F /* LaunchScreen.storyboard */; };
@@ -18,8 +17,7 @@
 /* Begin PBXFileReference section */
 		4A7CA7FB2A8AEC0100960D2F /* Soma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Soma.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A7CA7FE2A8AEC0100960D2F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		4A7CA8002A8AEC0100960D2F /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
-		4A7CA8022A8AEC0100960D2F /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
+		4A7CA8022A8AEC0100960D2F /* SomaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SomaViewController.swift; sourceTree = "<group>"; };
 		4A7CA8052A8AEC0100960D2F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4A7CA8072A8AEC0300960D2F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4A7CA80A2A8AEC0300960D2F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -55,14 +53,21 @@
 		4A7CA7FD2A8AEC0100960D2F /* Soma */ = {
 			isa = PBXGroup;
 			children = (
-				4A7CA7FE2A8AEC0100960D2F /* AppDelegate.swift */,
-				4A7CA8002A8AEC0100960D2F /* art.scnassets */,
-				4A7CA8022A8AEC0100960D2F /* GameViewController.swift */,
 				4A7CA8042A8AEC0100960D2F /* Main.storyboard */,
+				4A7CA8022A8AEC0100960D2F /* SomaViewController.swift */,
+				4A7CA8112A8AECE400960D2F /* Supporting Filea */,
+			);
+			path = Soma;
+			sourceTree = "<group>";
+		};
+		4A7CA8112A8AECE400960D2F /* Supporting Filea */ = {
+			isa = PBXGroup;
+			children = (
+				4A7CA7FE2A8AEC0100960D2F /* AppDelegate.swift */,
 				4A7CA8072A8AEC0300960D2F /* Assets.xcassets */,
 				4A7CA8092A8AEC0300960D2F /* LaunchScreen.storyboard */,
 			);
-			path = Soma;
+			path = "Supporting Filea";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -123,7 +128,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4A7CA8012A8AEC0100960D2F /* art.scnassets in Resources */,
 				4A7CA80B2A8AEC0300960D2F /* LaunchScreen.storyboard in Resources */,
 				4A7CA8082A8AEC0300960D2F /* Assets.xcassets in Resources */,
 				4A7CA8062A8AEC0100960D2F /* Main.storyboard in Resources */,
@@ -137,7 +141,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4A7CA8032A8AEC0100960D2F /* GameViewController.swift in Sources */,
+				4A7CA8032A8AEC0100960D2F /* SomaViewController.swift in Sources */,
 				4A7CA7FF2A8AEC0100960D2F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
