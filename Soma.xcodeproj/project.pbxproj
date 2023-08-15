@@ -12,6 +12,8 @@
 		4A7CA8062A8AEC0100960D2F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A7CA8042A8AEC0100960D2F /* Main.storyboard */; };
 		4A7CA8082A8AEC0300960D2F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4A7CA8072A8AEC0300960D2F /* Assets.xcassets */; };
 		4A7CA80B2A8AEC0300960D2F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A7CA8092A8AEC0300960D2F /* LaunchScreen.storyboard */; };
+		4A7CA8132A8AEDC900960D2F /* BlockNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7CA8122A8AEDC900960D2F /* BlockNode.swift */; };
+		4A7CA8152A8AEFD600960D2F /* ShapeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7CA8142A8AEFD600960D2F /* ShapeNode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +23,8 @@
 		4A7CA8052A8AEC0100960D2F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4A7CA8072A8AEC0300960D2F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4A7CA80A2A8AEC0300960D2F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		4A7CA8122A8AEDC900960D2F /* BlockNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockNode.swift; sourceTree = "<group>"; };
+		4A7CA8142A8AEFD600960D2F /* ShapeNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapeNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +59,8 @@
 			children = (
 				4A7CA8042A8AEC0100960D2F /* Main.storyboard */,
 				4A7CA8022A8AEC0100960D2F /* SomaViewController.swift */,
+				4A7CA8142A8AEFD600960D2F /* ShapeNode.swift */,
+				4A7CA8122A8AEDC900960D2F /* BlockNode.swift */,
 				4A7CA8112A8AECE400960D2F /* Supporting Filea */,
 			);
 			path = Soma;
@@ -141,7 +147,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4A7CA8132A8AEDC900960D2F /* BlockNode.swift in Sources */,
 				4A7CA8032A8AEC0100960D2F /* SomaViewController.swift in Sources */,
+				4A7CA8152A8AEFD600960D2F /* ShapeNode.swift in Sources */,
 				4A7CA7FF2A8AEC0100960D2F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
