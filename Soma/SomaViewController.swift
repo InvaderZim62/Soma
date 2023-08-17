@@ -52,6 +52,7 @@ import SceneKit
 struct Constants {
     static let blockSpacing: CGFloat = 1
     static let blockSize: CGFloat = 0.97 * Constants.blockSpacing  // slightly smaller, to prevent continuous contact detection
+    static let tableSize: CGFloat = 5 * blockSpacing
     static let cameraDistance: CGFloat = 23 * Constants.blockSpacing
 }
 
@@ -75,6 +76,7 @@ class SomaViewController: UIViewController {
         setupView()
         setupCamera()
         startingPositions = getEvenlySpacedEllipticalPoints(number: ShapeType.count, horizontalRadius: 3.5, verticalRadius: 7.0).shuffled()
+        createTableNode()
         createShapeNodes()
 
         // add tap gesture to select shapes, and rotate about screen z-axis
@@ -97,6 +99,12 @@ class SomaViewController: UIViewController {
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe))
         swipeRight.direction = .right
         scnView.addGestureRecognizer(swipeRight)
+    }
+    
+    private func createTableNode() {
+        let tableNode = TableNode()
+        tableNode.position = SCNVector3(0, -1.5 * Constants.blockSpacing, 0)
+        scnScene.rootNode.addChildNode(tableNode)
     }
     
     private func createShapeNodes() {
