@@ -11,6 +11,39 @@
 //      /
 //     z
 //
+//  Animating node rotation
+//  -----------------------
+//  The following line correctly converts a 3-axis rotation (SCNVector3) from scene coordinates to node coordinates,
+//  but different methods of using nodeRotation give different results
+//      let nodeRotation = scnScene.rootNode.convertVector(sceneRotation, to: selectedShapeNode)
+//      -or-
+//      let nodeAxes = scnScene.rootNode.convertVector(sceneAxes, to: selectedShapeNode), where sceneAxes and nodeAxes are unit vectors
+//
+//  Method 1:
+//  The following line of code is the simplest method of animation, be doesn't always work.  It seems to suffer from gimbal lock.
+//      selectedShapeNode.runAction(SCNAction.rotateBy(x: CGFloat(nodeRotation.x), y: CGFloat(nodeRotation.y), z: CGFloat(nodeRotation.z), duration: 0.2))
+//
+//  This line of code doesn't suffer from gimbal lock, but isn't animated
+//      selectedShapeNode.transform = SCNMatrix4Rotate(selectedShapeNode.transform, .pi/2, nodeAxes.x, nodeAxes.y, nodeAxes.z)
+//
+//  Method 2:
+//  The following animates the rotation (using presentation layer), but snaps back to the model layer (unchanged) when done
+//      let animation = CABasicAnimation(keyPath: "transform")
+//      animation.toValue = SCNMatrix4Rotate(selectedShapeNode.transform, .pi/2, nodeAxes.x, nodeAxes.y, nodeAxes.z)
+//      animation.duration = 1
+//      selectedShapeNode.addAnimation(animation, forKey: nil)
+//
+//  Method 3: (best)
+//  The following is not very intuitive, but works under all conditions.
+//  It's from this blog post: https://oleb.net/blog/2012/11/prevent-caanimation-snap-back
+//  It changes the model layer before launching the animation on the presentation layer starting from the original orientation.
+//      let originalTransform = selectedShapeNode.transform
+//      selectedShapeNode.transform = SCNMatrix4Rotate(selectedShapeNode.transform, .pi/2, nodeAxes.x, nodeAxes.y, nodeAxes.z)
+//      let animation = CABasicAnimation(keyPath: "transform")
+//      animation.fromValue = originalTransform
+//      animation.duration = 0.2
+//      selectedShapeNode.addAnimation(animation, forKey: nil)
+//
 
 import UIKit
 import QuartzCore
@@ -85,7 +118,8 @@ class SomaViewController: UIViewController {
         if let tappedShape = getShapeNodeAt(location) {
             if tappedShape == selectedShapeNode {
                 // selected shape tapped again (rotate 90 degrees about negative z-axis)
-                tappedShape.runAction(SCNAction.rotateBy(x: 0, y: 0, z: -.pi/2, duration: 0.2))
+                let sceneAxes = SCNVector3(0, 0, -1)
+                rotateNode(tappedShape, aboutSceneAxes: sceneAxes)
             } else {
                 // new shape tapped (select it)
                 selectedShapeNode = tappedShape
@@ -96,37 +130,26 @@ class SomaViewController: UIViewController {
         }
     }
     
-    // get shape node at location provided by tap gesture (nil if none tapped)
-    private func getShapeNodeAt(_ location: CGPoint) -> ShapeNode? {
-        var shapeNode: ShapeNode?
-        let hitResults = scnView.hitTest(location, options: nil)  // nil returns closest hit
-        if let result = hitResults.first(where: { $0.node.parent?.name == "Shape Node" }) {
-            shapeNode = result.node.parent as? ShapeNode
-        }
-        return shapeNode
-    }
-    
     // rotate selected shape 90 degrees at a time (vertical pan about scene x-axis, lateral pan about scene y-axis)
     @objc func handleSwipe(recognizer: UISwipeGestureRecognizer) {
         if let selectedShapeNode {
-            var sceneRotation: SCNVector3
+            var sceneAxes: SCNVector3
             switch recognizer.direction {
             case .up:
-                sceneRotation = SCNVector3(-CGFloat.pi/2, 0, 0)
+                sceneAxes = SCNVector3(-1, 0, 0)
             case .down:
-                sceneRotation = SCNVector3(CGFloat.pi/2, 0, 0)
+                sceneAxes = SCNVector3(1, 0, 0)
             case .left:
-                sceneRotation = SCNVector3(0, -CGFloat.pi/2, 0)
+                sceneAxes = SCNVector3(0, -1, 0)
             case .right:
-                sceneRotation = SCNVector3(0, CGFloat.pi/2, 0)
+                sceneAxes = SCNVector3(0, 1, 0)
             default:
-                sceneRotation = SCNVector3(0, 0, 0)
+                sceneAxes = SCNVector3(0, 0, 0)
             }
-            let nodeRotation = scnScene.rootNode.convertVector(sceneRotation, to: selectedShapeNode)
-            selectedShapeNode.runAction(SCNAction.rotateBy(x: CGFloat(nodeRotation.x), y: CGFloat(nodeRotation.y), z: CGFloat(nodeRotation.z), duration: 0.2))
+            rotateNode(selectedShapeNode, aboutSceneAxes: sceneAxes)
         }
     }
-
+    
     // MARK: - Setup
     
     private func setupScene() {
@@ -151,6 +174,29 @@ class SomaViewController: UIViewController {
     }
     
     // MARK: - Utility functions
+    
+    // get shape node at location provided by tap gesture (nil if none tapped)
+    private func getShapeNodeAt(_ location: CGPoint) -> ShapeNode? {
+        var shapeNode: ShapeNode?
+        let hitResults = scnView.hitTest(location, options: nil)  // nil returns closest hit
+        if let result = hitResults.first(where: { $0.node.parent?.name == "Shape Node" }) {
+            shapeNode = result.node.parent as? ShapeNode
+        }
+        return shapeNode
+    }
+
+    private func rotateNode(_ node: SCNNode, aboutSceneAxes sceneAxes: SCNVector3) {
+        let nodeAxes = scnScene.rootNode.convertVector(sceneAxes, to: selectedShapeNode)
+        
+        // the following is a trick to animate the rotation, and not have it snap back to its original orientation
+        // from: https://oleb.net/blog/2012/11/prevent-caanimation-snap-back
+        let originalTransform = node.transform
+        node.transform = SCNMatrix4Rotate(node.transform, .pi/2, nodeAxes.x, nodeAxes.y, nodeAxes.z)
+        let animation = CABasicAnimation(keyPath: "transform")
+        animation.fromValue = originalTransform
+        animation.duration = 0.2
+        node.addAnimation(animation, forKey: nil)
+    }
 
     // compute equally-spaced positions around a 3D ellipse at z = 0
     private func getEvenlySpacedEllipticalPoints(number: Int, horizontalRadius a: Double, verticalRadius b: Double) -> [SCNVector3] {

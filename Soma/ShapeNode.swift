@@ -3,7 +3,7 @@
 //  Soma
 //
 //  Created by Phil Stern on 8/14/23.
-//                                                           ◻️      ◻️ <- big blocks out of page
+//                                                           ◻️      ◻️ <- big blocks are out of page
 //  ShapeTypes  ◽️         ◽️        ◽️         ◽️◽️       ◽️      ◽️       ◽️
 //         V: ◽️◽️  L: ◽️◽️◽️  T: ◽️◽️◽️  Z: ◽️◽️    A: ◽️◽️  B:  ◽️◽️  P: ◽️◽️
 //    origin:    ^        ^           ^          ^          ^        ^       ^◻️
