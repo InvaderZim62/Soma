@@ -72,8 +72,8 @@ class SomaViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupScene()
-        setupCamera()
         setupView()
+        setupCamera()
         startingPositions = getEvenlySpacedEllipticalPoints(number: ShapeType.count, horizontalRadius: 3.5, verticalRadius: 7.0).shuffled()
         createShapeNodes()
 
@@ -98,7 +98,7 @@ class SomaViewController: UIViewController {
         swipeRight.direction = .right
         scnView.addGestureRecognizer(swipeRight)
     }
-
+    
     private func createShapeNodes() {
         for (index, shape) in ShapeType.allCases.enumerated() {
             let shapeNode = ShapeNode(type: shape)
@@ -157,13 +157,6 @@ class SomaViewController: UIViewController {
         scnScene.background.contents = "Background_Diffuse.png"
     }
     
-    private func setupCamera() {
-        cameraNode = SCNNode()
-        cameraNode.camera = SCNCamera()
-        cameraNode.position = SCNVector3(0, 0, Constants.cameraDistance)
-        scnScene.rootNode.addChildNode(cameraNode)
-    }
-
     private func setupView() {
         scnView = self.view as? SCNView
         scnView.allowsCameraControl = false  // false: move camera programmatically
@@ -171,6 +164,20 @@ class SomaViewController: UIViewController {
         scnView.autoenablesDefaultLighting = true
         scnView.isPlaying = true  // prevent SceneKit from entering a "paused" state, if there isn't anything to animate
         scnView.scene = scnScene
+    }
+    
+    private func setupCamera() {
+        cameraNode = SCNNode()
+        cameraNode.camera = SCNCamera()
+        rotateCameraAroundBoardCenter(deltaAngle: -.pi/4)  // move up 45 deg (looking down)
+        scnScene.rootNode.addChildNode(cameraNode)
+    }
+    
+    // rotate camera around scene x-axis, while continuing to point at scene center
+    private func rotateCameraAroundBoardCenter(deltaAngle: CGFloat) {
+        cameraNode.transform = SCNMatrix4Rotate(cameraNode.transform, Float(deltaAngle), 1, 0, 0)
+        let cameraAngle = CGFloat(cameraNode.eulerAngles.x)
+        cameraNode.position = SCNVector3(0, -Constants.cameraDistance * sin(cameraAngle), Constants.cameraDistance * cos(cameraAngle))
     }
     
     // MARK: - Utility functions
@@ -184,7 +191,7 @@ class SomaViewController: UIViewController {
         }
         return shapeNode
     }
-
+    
     private func rotateNode(_ node: SCNNode, aboutSceneAxes sceneAxes: SCNVector3) {
         let nodeAxes = scnScene.rootNode.convertVector(sceneAxes, to: selectedShapeNode)
         
@@ -197,7 +204,7 @@ class SomaViewController: UIViewController {
         animation.duration = 0.2
         node.addAnimation(animation, forKey: nil)
     }
-
+    
     // compute equally-spaced positions around a 3D ellipse at z = 0
     private func getEvenlySpacedEllipticalPoints(number: Int, horizontalRadius a: Double, verticalRadius b: Double) -> [SCNVector3] {
         var points = [SCNVector3]()
