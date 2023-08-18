@@ -68,6 +68,7 @@ class SomaViewController: UIViewController {
             pastSelectedShapeNode?.isHighlighted = false
             selectedShapeNode?.isHighlighted = true
             pastSelectedShapeNode = selectedShapeNode
+            scnView.allowsCameraControl = selectedShapeNode == nil
         }
     }
     var pastSelectedShapeNode: ShapeNode?
@@ -185,7 +186,7 @@ class SomaViewController: UIViewController {
     
     private func setupView() {
         scnView = self.view as? SCNView
-        scnView.allowsCameraControl = false  // false: move camera programmatically
+        scnView.allowsCameraControl = true  // true: allow standard camera controls with panning, false: move camera programmatically
         scnView.showsStatistics = true
         scnView.autoenablesDefaultLighting = true
         scnView.isPlaying = true  // prevent SceneKit from entering a "paused" state, if there isn't anything to animate
