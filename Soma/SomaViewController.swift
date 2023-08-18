@@ -80,8 +80,14 @@ class SomaViewController: UIViewController {
         createShapeNodes()
 
         // add tap gesture to select shapes, and rotate about screen z-axis
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-        scnView.addGestureRecognizer(tapGesture)
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        doubleTap.numberOfTapsRequired = 2
+        scnView.addGestureRecognizer(doubleTap)
+        
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        singleTap.numberOfTapsRequired = 1
+        singleTap.require(toFail: doubleTap)
+        scnView.addGestureRecognizer(singleTap)
         
         // add swipe gestures to rotate shapes about screen x- and y-axes
         let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe))
@@ -126,7 +132,12 @@ class SomaViewController: UIViewController {
         if let tappedShape = getShapeNodeAt(location) {
             if tappedShape == selectedShapeNode {
                 // selected shape tapped again (rotate 90 degrees about negative z-axis)
-                let sceneAxes = SCNVector3(0, 0, -1)
+                var sceneAxes: SCNVector3
+                if recognizer.numberOfTapsRequired == 1 {
+                    sceneAxes = SCNVector3(0, 0, -1)
+                } else {
+                    sceneAxes = SCNVector3(0, 0, 1)
+                }
                 rotateNode(tappedShape, aboutSceneAxes: sceneAxes)
             } else {
                 // new shape tapped (select it)
