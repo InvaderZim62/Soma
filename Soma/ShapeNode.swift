@@ -75,41 +75,42 @@ class ShapeNode: SCNNode {
 
     func setup() {
         let size = Constants.blockSpacing
+        let shapeColor = color  // just compute once
         switch type {
         case .V:
-            addBlockNode(position: SCNVector3( -size,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
+            addBlockNode(position: SCNVector3( -size,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: shapeColor)
         case .L:
-            addBlockNode(position: SCNVector3( -size,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(  size,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(  size, size,    0), color: color)
+            addBlockNode(position: SCNVector3( -size,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(  size,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(  size, size,    0), color: shapeColor)
         case .T:
-            addBlockNode(position: SCNVector3( -size,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(  size,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
+            addBlockNode(position: SCNVector3( -size,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(  size,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: shapeColor)
         case .Z:
-            addBlockNode(position: SCNVector3( -size,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
-            addBlockNode(position: SCNVector3(  size, size,    0), color: color)
+            addBlockNode(position: SCNVector3( -size,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(  size, size,    0), color: shapeColor)
         case .A:
-            addBlockNode(position: SCNVector3( -size,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
-            addBlockNode(position: SCNVector3(     0, size, size), color: color)
+            addBlockNode(position: SCNVector3( -size,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0, size, size), color: shapeColor)
         case .B:
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(  size,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
-            addBlockNode(position: SCNVector3(     0, size, size), color: color)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(  size,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0, size, size), color: shapeColor)
         case .P:
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(  size,    0,    0), color: color)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
-            addBlockNode(position: SCNVector3(     0,    0, size), color: color)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(  size,    0,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: shapeColor)
+            addBlockNode(position: SCNVector3(     0,    0, size), color: shapeColor)
         }
     }
     
@@ -120,9 +121,10 @@ class ShapeNode: SCNNode {
     }
     
     private func updateColor() {
+        let shapeColor = color
         for childNode in childNodes {
             if let blockNode = childNode as? BlockNode {
-                blockNode.setColorTo(color)
+                blockNode.setColorTo(shapeColor)
             }
         }
     }
