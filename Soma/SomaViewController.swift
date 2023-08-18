@@ -63,7 +63,14 @@ class SomaViewController: UIViewController {
     var scnView: SCNView!
 
     var shapeNodes = [ShapeNode]()  // pws: is this needed?
-    var selectedShapeNode: ShapeNode?
+    var selectedShapeNode: ShapeNode? {
+        didSet {
+            pastSelectedShapeNode?.isHighlighted = false
+            selectedShapeNode?.isHighlighted = true
+            pastSelectedShapeNode = selectedShapeNode
+        }
+    }
+    var pastSelectedShapeNode: ShapeNode?
     var startingPositions = [SCNVector3]()
 
     override var prefersStatusBarHidden: Bool {

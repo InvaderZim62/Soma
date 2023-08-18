@@ -36,6 +36,26 @@ enum ShapeType: Int, CaseIterable {
 class ShapeNode: SCNNode {
 
     var type = ShapeType.V
+    var isHighlighted = false { didSet { updateColor() } }
+    
+    var color: UIColor {
+        switch type {
+        case .V:
+            return isHighlighted ? .white : .cyan
+        case .L:
+            return isHighlighted ? .white : .orange
+        case .T:
+            return isHighlighted ? .white : .purple
+        case .Z:
+            return isHighlighted ? .white : .green
+        case .A:
+            return isHighlighted ? .white : .red
+        case .B:
+            return isHighlighted ? .white : .blue
+        case .P:
+            return isHighlighted ? .white : .yellow
+        }
+    }
     
     var zRotationDegrees: Int {
         return Int(round(eulerAngles.z * 180 / .pi))
@@ -57,39 +77,39 @@ class ShapeNode: SCNNode {
         let size = Constants.blockSpacing
         switch type {
         case .V:
-            addBlockNode(position: SCNVector3( -size,    0,    0), color: .cyan)
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: .cyan)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: .cyan)
+            addBlockNode(position: SCNVector3( -size,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
         case .L:
-            addBlockNode(position: SCNVector3( -size,    0,    0), color: .orange)
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: .orange)
-            addBlockNode(position: SCNVector3(  size,    0,    0), color: .orange)
-            addBlockNode(position: SCNVector3(  size, size,    0), color: .orange)
+            addBlockNode(position: SCNVector3( -size,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(  size,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(  size, size,    0), color: color)
         case .T:
-            addBlockNode(position: SCNVector3( -size,    0,    0), color: .purple)
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: .purple)
-            addBlockNode(position: SCNVector3(  size,    0,    0), color: .purple)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: .purple)
+            addBlockNode(position: SCNVector3( -size,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(  size,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
         case .Z:
-            addBlockNode(position: SCNVector3( -size,    0,    0), color: .green)
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: .green)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: .green)
-            addBlockNode(position: SCNVector3(  size, size,    0), color: .green)
+            addBlockNode(position: SCNVector3( -size,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
+            addBlockNode(position: SCNVector3(  size, size,    0), color: color)
         case .A:
-            addBlockNode(position: SCNVector3( -size,    0,    0), color: .red)
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: .red)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: .red)
-            addBlockNode(position: SCNVector3(     0, size, size), color: .red)
+            addBlockNode(position: SCNVector3( -size,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
+            addBlockNode(position: SCNVector3(     0, size, size), color: color)
         case .B:
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: .blue)
-            addBlockNode(position: SCNVector3(  size,    0,    0), color: .blue)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: .blue)
-            addBlockNode(position: SCNVector3(     0, size, size), color: .blue)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(  size,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
+            addBlockNode(position: SCNVector3(     0, size, size), color: color)
         case .P:
-            addBlockNode(position: SCNVector3(     0,    0,    0), color: .yellow)
-            addBlockNode(position: SCNVector3(  size,    0,    0), color: .yellow)
-            addBlockNode(position: SCNVector3(     0, size,    0), color: .yellow)
-            addBlockNode(position: SCNVector3(     0,    0, size), color: .yellow)
+            addBlockNode(position: SCNVector3(     0,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(  size,    0,    0), color: color)
+            addBlockNode(position: SCNVector3(     0, size,    0), color: color)
+            addBlockNode(position: SCNVector3(     0,    0, size), color: color)
         }
     }
     
@@ -97,5 +117,13 @@ class ShapeNode: SCNNode {
         let blockNode = BlockNode(color: color)
         blockNode.position = position
         addChildNode(blockNode)
+    }
+    
+    private func updateColor() {
+        for childNode in childNodes {
+            if let blockNode = childNode as? BlockNode {
+                blockNode.setColorTo(color)
+            }
+        }
     }
 }

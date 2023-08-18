@@ -17,11 +17,15 @@ class BlockNode: SCNNode {
                           height: Constants.blockSize,
                           length: Constants.blockSize,
                           chamferRadius: 0.1 * Constants.blockSize)
-        geometry?.firstMaterial?.diffuse.contents = color
+        setColorTo(color)
         physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+    }
+    
+    func setColorTo(_ color: UIColor) {
+        geometry?.firstMaterial?.diffuse.contents = color
     }
 }
