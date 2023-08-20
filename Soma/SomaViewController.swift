@@ -116,14 +116,16 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // add pan gesture to move selected shape around screen
         let pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
-        pan.delegate = self  // allows system to call gestureRecognizer (bottom of file)
+        pan.delegate = self  // allows system to call gestureRecognizer (bottom of file); requires SomaViewController conforms to UIGestureRecognizerDelegate
         pan.require(toFail: swipeUp)  // must pan node slowly or diagonally, for swipe to fail
         pan.require(toFail: swipeDown)
         pan.require(toFail: swipeLeft)
         pan.require(toFail: swipeRight)
         scnView.addGestureRecognizer(pan)
         
-        // require my pan gesture to fail, before allowing camera's pan gesture to work (force my pan to fail in handlePan, if selectedShapeNode = nil)
+        // require my pan gesture to fail, before allowing camera's pan gesture to work;
+        // force my pan to fail in handlePan, if selectedShapeNode = nil;
+        // requires gestureRecognizer(shouldRecognizeSimultaneouslyWith:), below
         let panGestures = scnView.gestureRecognizers!.filter { $0 is UIPanGestureRecognizer } as! [UIPanGestureRecognizer]  // my pan and default camera pan
         if !panGestures.isEmpty {
             let cameraPanGesture = panGestures.first!
@@ -198,8 +200,9 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
             let location = recognizer.location(in: scnView)  // absolute 2D screen coordinates
             let translation = recognizer.translation(in: scnView)  // relative (to start of pan) 2D screen coordinates
             let hitResults = scnView.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
+            print("location: \(location), translation: \(translation)")
             if let result = hitResults.first {
-                print("location: \(location), translation: \(translation)")
+                // TBD
             }
             
 //            switch recognizer.state {
