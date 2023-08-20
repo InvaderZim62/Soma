@@ -62,7 +62,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     var cameraNode: SCNNode!
     var scnView: SCNView!
 
-    var shapeNodes = [ShapeNode]()  // pws: is this needed?
+    var shapeNodes = [String: ShapeNode]()  // [ShapeType: ShapeNode]
     var selectedShapeNode: ShapeNode? {
         didSet {
             pastSelectedShapeNode?.isHighlighted = false
@@ -83,7 +83,8 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         setupScene()
         setupView()
         setupCamera()
-        startingPositions = getEvenlySpacedEllipticalPoints(number: ShapeType.count, horizontalRadius: 3.5, verticalRadius: 7.0).shuffled()
+//        startingPositions = getEvenlySpacedEllipticalPoints(number: ShapeType.allCases.count, horizontalRadius: 3.5, verticalRadius: 7.0).shuffled()
+        startingPositions = getGridOfPoints(number: ShapeType.allCases.count)
         createTableNode()
         createShapeNodes()
 
@@ -135,19 +136,23 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private func createTableNode() {
         let tableNode = TableNode()
-        tableNode.position = SCNVector3(0, -1.5 * Constants.blockSpacing, 0)
+        tableNode.position = SCNVector3(0, -3 * Constants.blockSpacing, 0)
         scnScene.rootNode.addChildNode(tableNode)
     }
     
     private func createShapeNodes() {
-        for (index, shape) in ShapeType.allCases.enumerated() {
+        for (index, shape) in ShapeType.allCases.reversed().enumerated() {
             let shapeNode = ShapeNode(type: shape)
             shapeNode.position = startingPositions[index]
-            shapeNode.eulerAngles.y = [0, .pi / 2, .pi, 3 * .pi / 2].randomElement()!  // rotate around y-axis (0, 90, or 270 deg)
-            shapeNode.eulerAngles.x = [0, .pi].randomElement()!  // rotate around x-axis (0 or 180 deg)
-            shapeNodes.append(shapeNode)
+//            shapeNode.eulerAngles.y = [0, .pi / 2, .pi, 3 * .pi / 2].randomElement()!  // rotate around y-axis (0, 90, or 270 deg)
+//            shapeNode.eulerAngles.x = [0, .pi].randomElement()!  // rotate around x-axis (0 or 180 deg)
+            shapeNodes[shape.rawValue] = shapeNode
             scnScene.rootNode.addChildNode(shapeNode)
         }
+        
+        // rotate these shapes to fit better when using initial grid positions
+        shapeNodes["L"]?.eulerAngles.z = .pi / 2
+        shapeNodes["A"]?.eulerAngles.z = -.pi / 2
     }
     
     // MARK: - Gesture Recognizers
@@ -273,6 +278,25 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         animation.fromValue = originalTransform
         animation.duration = 0.2
         node.addAnimation(animation, forKey: nil)
+    }
+    
+    private func getGridOfPoints(number: Int) -> [SCNVector3] {
+        var points = [SCNVector3]()
+        let maxCol = 3
+        let topRowY = 3
+        var count = 0
+        repeat {
+            for col in 0..<maxCol {
+                let row = Int(count / maxCol)
+                let point = SCNVector3(Double(col - maxCol / 2) * 3 * Constants.blockSpacing,
+                                       Double(topRowY - row) * 3 * Constants.blockSpacing,
+                                       0)
+                points.append(point)
+                count += 1
+            }
+        } while count < number
+        
+        return points
     }
     
     // compute equally-spaced positions around a 3D ellipse at z = 0

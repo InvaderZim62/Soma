@@ -19,7 +19,7 @@
 import UIKit
 import SceneKit
 
-enum ShapeType: Int, CaseIterable {
+enum ShapeType: String, CaseIterable {
     case V
     case L
     case T
@@ -27,10 +27,6 @@ enum ShapeType: Int, CaseIterable {
     case A
     case B
     case P
-    
-    static var count: Int {
-        ShapeType.allCases.count
-    }
 }
 
 class ShapeNode: SCNNode {
