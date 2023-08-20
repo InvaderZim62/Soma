@@ -56,7 +56,7 @@ struct Constants {
     static let cameraDistance: CGFloat = 23 * Constants.blockSpacing
 }
 
-class SomaViewController: UIViewController {
+class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var scnScene: SCNScene!
     var cameraNode: SCNNode!
@@ -113,6 +113,22 @@ class SomaViewController: UIViewController {
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe))
         swipeRight.direction = .right
         scnView.addGestureRecognizer(swipeRight)
+        
+        // add pan gesture to move selected shape around screen
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
+        pan.delegate = self  // allows system to call gestureRecognizer (bottom of file)
+        pan.require(toFail: swipeUp)  // must pan node slowly or diagonally, for swipe to fail
+        pan.require(toFail: swipeDown)
+        pan.require(toFail: swipeLeft)
+        pan.require(toFail: swipeRight)
+        scnView.addGestureRecognizer(pan)
+        
+        // require my pan gesture to fail, before allowing camera's pan gesture to work (force my pan to fail in handlePan, if selectedShapeNode = nil)
+        let panGestures = scnView.gestureRecognizers!.filter { $0 is UIPanGestureRecognizer } as! [UIPanGestureRecognizer]  // my pan and default camera pan
+        if !panGestures.isEmpty {
+            let cameraPanGesture = panGestures.first!
+            cameraPanGesture.require(toFail: pan)
+        }
     }
     
     private func createTableNode() {
@@ -173,6 +189,34 @@ class SomaViewController: UIViewController {
         }
     }
     
+    @objc func handlePan(recognizer: UIPanGestureRecognizer) {
+        if selectedShapeNode == nil {
+            recognizer.state = .failed  // force my pan gesture to fail, so camera's pan gesture can take over
+            return
+        }
+        if let pannedShapeNode = selectedShapeNode {
+            let location = recognizer.location(in: scnView)  // absolute 2D screen coordinates
+            let translation = recognizer.translation(in: scnView)  // relative (to start of pan) 2D screen coordinates
+            let hitResults = scnView.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
+            if let result = hitResults.first {
+                print("location: \(location), translation: \(translation)")
+            }
+            
+//            switch recognizer.state {
+//            case .changed:
+//            default:
+//                break
+//            }
+        }
+    }
+
+    // MARK: - UIGestureRecognizerDelegate
+    
+    // allow two simultaneous pan gesture recognizers (mine and the camera's)
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+
     // MARK: - Setup
     
     private func setupScene() {
