@@ -52,8 +52,9 @@ import SceneKit
 struct Constants {
     static let blockSpacing: CGFloat = 1
     static let blockSize: CGFloat = 0.97 * Constants.blockSpacing  // slightly smaller, to prevent continuous contact detection
-    static let tableSize: CGFloat = 5 * blockSpacing
-    static let cameraDistance: CGFloat = 23 * Constants.blockSpacing
+    static let tableSize: CGFloat = 7 * blockSpacing
+    static let tableThickness: CGFloat = 0.05 * tableSize
+    static let cameraDistance: CGFloat = 24 * Constants.blockSpacing
 }
 
 class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
@@ -244,7 +245,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     private func setupCamera() {
         cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
-        rotateCameraAroundBoardCenter(deltaAngle: -.pi/4)  // move up 45 deg (looking down)
+        rotateCameraAroundBoardCenter(deltaAngle: -.pi/9)  // move up 20 deg (looking down)
         scnScene.rootNode.addChildNode(cameraNode)
     }
     

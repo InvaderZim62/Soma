@@ -14,9 +14,9 @@ class TableNode: SCNNode {
         super.init()
         name = "Table Node"
         geometry = SCNBox(width: Constants.tableSize,
-                          height: 0.1 * Constants.tableSize,
+                          height: Constants.tableThickness,
                           length: Constants.tableSize,
-                          chamferRadius: 0.1 * Constants.tableSize)
+                          chamferRadius: Constants.tableThickness)
         geometry?.firstMaterial?.diffuse.contents = UIColor.brown
         physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
     }
