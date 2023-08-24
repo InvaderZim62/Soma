@@ -52,8 +52,9 @@ import SceneKit
 struct Constants {
     static let blockSpacing: CGFloat = 1
     static let blockSize: CGFloat = 0.97 * Constants.blockSpacing  // slightly smaller, to prevent continuous contact detection
-    static let tableSize: CGFloat = 7 * blockSpacing
+    static let tableSize: CGFloat = 12 * blockSpacing
     static let tableThickness: CGFloat = 0.05 * tableSize
+    static let tablePositionY: CGFloat = -3 * blockSpacing
     static let cameraDistance: CGFloat = 24 * Constants.blockSpacing
 }
 
@@ -85,7 +86,8 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         setupView()
         setupCamera()
 //        startingPositions = getEvenlySpacedEllipticalPoints(number: ShapeType.allCases.count, horizontalRadius: 3.5, verticalRadius: 7.0).shuffled()
-        startingPositions = getGridOfPoints(number: ShapeType.allCases.count)
+//        startingPositions = getGridOfPoints(number: ShapeType.allCases.count)
+        startingPositions = getEvenlySpacedCircularPoints(number: ShapeType.allCases.count, radius: 0.4 * Constants.tableSize)
         createTableNode()
         createShapeNodes()
 
@@ -137,7 +139,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private func createTableNode() {
         let tableNode = TableNode()
-        tableNode.position = SCNVector3(0, -3 * Constants.blockSpacing, 0)
+        tableNode.position = SCNVector3(0, Constants.tablePositionY, 0)
         scnScene.rootNode.addChildNode(tableNode)
     }
     
@@ -152,8 +154,8 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         }
         
         // rotate these shapes to fit better when using initial grid positions
-        shapeNodes["L"]?.eulerAngles.z = .pi / 2
-        shapeNodes["A"]?.eulerAngles.z = -.pi / 2
+//        shapeNodes["L"]?.eulerAngles.z = .pi / 2
+//        shapeNodes["A"]?.eulerAngles.z = -.pi / 2
     }
     
     // MARK: - Gesture Recognizers
@@ -245,7 +247,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     private func setupCamera() {
         cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
-        rotateCameraAroundBoardCenter(deltaAngle: -.pi/9)  // move up 20 deg (looking down)
+        rotateCameraAroundBoardCenter(deltaAngle: -40 * .pi / 180.0)  // move up X deg (looking down)
         scnScene.rootNode.addChildNode(cameraNode)
     }
     
@@ -297,6 +299,16 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
             }
         } while count < number
         
+        return points
+    }
+    
+    // compute equally-spaced positions around a 3D circle at y = tablePositionY
+    private func getEvenlySpacedCircularPoints(number: Int, radius: Double) -> [SCNVector3] {
+        var points = [SCNVector3]()
+        for n in 0..<number {
+            let theta = 2 * Double.pi * Double(n) / Double(number)
+            points.append(SCNVector3(radius * cos(theta), Constants.tablePositionY + (Constants.tableThickness + Constants.blockSize) / 2, radius * sin(theta)))
+        }
         return points
     }
     
