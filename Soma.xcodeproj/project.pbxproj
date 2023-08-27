@@ -15,6 +15,7 @@
 		4A7CA8132A8AEDC900960D2F /* BlockNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7CA8122A8AEDC900960D2F /* BlockNode.swift */; };
 		4A7CA8152A8AEFD600960D2F /* ShapeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7CA8142A8AEFD600960D2F /* ShapeNode.swift */; };
 		4A7CA8172A8EE82400960D2F /* TableNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7CA8162A8EE82400960D2F /* TableNode.swift */; };
+		4A7CA8382A9AC77A00960D2F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7CA8372A9AC77A00960D2F /* Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		4A7CA8122A8AEDC900960D2F /* BlockNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockNode.swift; sourceTree = "<group>"; };
 		4A7CA8142A8AEFD600960D2F /* ShapeNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapeNode.swift; sourceTree = "<group>"; };
 		4A7CA8162A8EE82400960D2F /* TableNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableNode.swift; sourceTree = "<group>"; };
+		4A7CA8372A9AC77A00960D2F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 				4A7CA8142A8AEFD600960D2F /* ShapeNode.swift */,
 				4A7CA8122A8AEDC900960D2F /* BlockNode.swift */,
 				4A7CA8162A8EE82400960D2F /* TableNode.swift */,
+				4A7CA8372A9AC77A00960D2F /* Extensions.swift */,
 				4A7CA8112A8AECE400960D2F /* Supporting Filea */,
 			);
 			path = Soma;
@@ -151,6 +154,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4A7CA8132A8AEDC900960D2F /* BlockNode.swift in Sources */,
+				4A7CA8382A9AC77A00960D2F /* Extensions.swift in Sources */,
 				4A7CA8032A8AEC0100960D2F /* SomaViewController.swift in Sources */,
 				4A7CA8172A8EE82400960D2F /* TableNode.swift in Sources */,
 				4A7CA8152A8AEFD600960D2F /* ShapeNode.swift in Sources */,

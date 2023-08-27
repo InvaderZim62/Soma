@@ -5,11 +5,11 @@
 //  Created by Phil Stern on 8/14/23.
 //
 //  SceneKit axes
-//       y
+//       y (green)
 //       |
-//       |___ x
+//       |___ x (red)
 //      /
-//     z
+//     z (blue)
 //
 //  Animating node rotation
 //  -----------------------
@@ -55,7 +55,7 @@ struct Constants {
     static let tableSize: CGFloat = 12 * blockSpacing
     static let tableThickness: CGFloat = 0.05 * tableSize
     static let tablePositionY: CGFloat = -3 * blockSpacing
-    static let cameraDistance: CGFloat = 24 * Constants.blockSpacing
+    static let cameraDistance: Float = 24 * Float(Constants.blockSpacing)
 }
 
 class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
@@ -64,6 +64,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     var cameraNode: SCNNode!
     var scnView: SCNView!
 
+    let tableNode = TableNode()
     var shapeNodes = [String: ShapeNode]()  // [ShapeType: ShapeNode]
     var selectedShapeNode: ShapeNode? {
         didSet {
@@ -85,8 +86,6 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         setupScene()
         setupView()
         setupCamera()
-//        startingPositions = getEvenlySpacedEllipticalPoints(number: ShapeType.allCases.count, horizontalRadius: 3.5, verticalRadius: 7.0).shuffled()
-//        startingPositions = getGridOfPoints(number: ShapeType.allCases.count)
         startingPositions = getEvenlySpacedCircularPoints(number: ShapeType.allCases.count, radius: 0.4 * Constants.tableSize)
         createTableNode()
         createShapeNodes()
@@ -138,40 +137,34 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     private func createTableNode() {
-        let tableNode = TableNode()
         tableNode.position = SCNVector3(0, Constants.tablePositionY, 0)
         scnScene.rootNode.addChildNode(tableNode)
     }
     
     private func createShapeNodes() {
-        for (index, shape) in ShapeType.allCases.reversed().enumerated() {
+        for (index, shape) in ShapeType.allCases.enumerated() {
             let shapeNode = ShapeNode(type: shape)
             shapeNode.position = startingPositions[index]
-//            shapeNode.eulerAngles.y = [0, .pi / 2, .pi, 3 * .pi / 2].randomElement()!  // rotate around y-axis (0, 90, or 270 deg)
-//            shapeNode.eulerAngles.x = [0, .pi].randomElement()!  // rotate around x-axis (0 or 180 deg)
             shapeNodes[shape.rawValue] = shapeNode
             scnScene.rootNode.addChildNode(shapeNode)
         }
-        
-        // rotate these shapes to fit better when using initial grid positions
-//        shapeNodes["L"]?.eulerAngles.z = .pi / 2
-//        shapeNodes["A"]?.eulerAngles.z = -.pi / 2
     }
     
     // MARK: - Gesture Recognizers
     
-    // make tapped shape the selected shape, or rotate about scene z-axis, if already selected
+    // make tapped shape the selected shape, or rotate about camera z-axis, if already selected
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
         let location = recognizer.location(in: scnView)
-        if let tappedShape = getShapeNodeAt(location) {
-            if tappedShape == selectedShapeNode {
-                // selected shape tapped again (rotate 90 degrees about z-axis)
+        if let tappedShapeNode = getShapeNodeAt(location), let pov = scnView.pointOfView {
+            if tappedShapeNode == selectedShapeNode {
+                // selected shape tapped again (rotate 90 degrees about camera z-axis)
                 // single-tap: clockwise, double-tap counter-clockwise
-                let sceneAxes = recognizer.numberOfTapsRequired == 1 ? SCNVector3(0, 0, -1) : SCNVector3(0, 0, 1)
-                rotateNode(tappedShape, aboutSceneAxes: sceneAxes)
+                let cameraAxis = recognizer.numberOfTapsRequired == 1 ? pov.worldFront : -pov.worldFront
+                let shapeAxis = scnScene.rootNode.convertVector(cameraAxis, to: selectedShapeNode)
+                rotateNode(tappedShapeNode, aboutAxis: shapeAxis)
             } else {
                 // new shape tapped (select it)
-                selectedShapeNode = tappedShape
+                selectedShapeNode = tappedShapeNode
             }
         } else {
             // no shape tapped (deselect all)
@@ -179,23 +172,25 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    // rotate selected shape 90 degrees at a time (vertical pan about scene x-axis, lateral pan about scene y-axis)
+    // rotate selected shape 90 degrees at a time (vertical pan about camera x-axis, lateral pan about camera y-axis)
     @objc func handleSwipe(recognizer: UISwipeGestureRecognizer) {
-        if let selectedShapeNode {
-            var sceneAxes: SCNVector3
+        if let selectedShapeNode, let pov = scnView.pointOfView {
+            var cameraAxis: SCNVector3
             switch recognizer.direction {
             case .up:
-                sceneAxes = SCNVector3(-1, 0, 0)
+                cameraAxis = -pov.worldRight
             case .down:
-                sceneAxes = SCNVector3(1, 0, 0)
+                cameraAxis = pov.worldRight
             case .left:
-                sceneAxes = SCNVector3(0, -1, 0)
+                cameraAxis = -pov.worldUp
             case .right:
-                sceneAxes = SCNVector3(0, 1, 0)
+                cameraAxis = pov.worldUp
             default:
-                sceneAxes = SCNVector3(0, 0, 0)
+                cameraAxis = SCNVector3Zero
             }
-            rotateNode(selectedShapeNode, aboutSceneAxes: sceneAxes)
+            
+            let shapeAxis = scnScene.rootNode.convertVector(cameraAxis, to: selectedShapeNode)
+            rotateNode(selectedShapeNode, aboutAxis: shapeAxis)
         }
     }
     
@@ -241,21 +236,17 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         scnView.showsStatistics = true
         scnView.autoenablesDefaultLighting = true
         scnView.isPlaying = true  // prevent SceneKit from entering a "paused" state, if there isn't anything to animate
+//        scnView.debugOptions = .showPhysicsShapes
         scnView.scene = scnScene
     }
     
     private func setupCamera() {
         cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
-        rotateCameraAroundBoardCenter(deltaAngle: -40 * .pi / 180.0)  // move up X deg (looking down)
-        scnScene.rootNode.addChildNode(cameraNode)
-    }
-    
-    // rotate camera around scene x-axis, while continuing to point at scene center
-    private func rotateCameraAroundBoardCenter(deltaAngle: CGFloat) {
-        cameraNode.transform = SCNMatrix4Rotate(cameraNode.transform, Float(deltaAngle), 1, 0, 0)
-        let cameraAngle = CGFloat(cameraNode.eulerAngles.x)
+        let cameraAngle: Float = -40 * .pi / 180  // position camera 40 degrees above horizon
         cameraNode.position = SCNVector3(0, -Constants.cameraDistance * sin(cameraAngle), Constants.cameraDistance * cos(cameraAngle))
+        cameraNode.constraints = [SCNLookAtConstraint(target: tableNode)]  // point camera at center of table
+        scnScene.rootNode.addChildNode(cameraNode)
     }
     
     // MARK: - Utility functions
@@ -270,6 +261,17 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         return shapeNode
     }
     
+    private func rotateNode(_ node: SCNNode, aboutAxis nodeAxis: SCNVector3) {
+        // the following is a trick to animate the rotation, and not have it snap back to its original orientation
+        // from: https://oleb.net/blog/2012/11/prevent-caanimation-snap-back
+        let originalTransform = node.transform
+        node.transform = SCNMatrix4Rotate(node.transform, .pi/2, nodeAxis.x, nodeAxis.y, nodeAxis.z)
+        let animation = CABasicAnimation(keyPath: "transform")
+        animation.fromValue = originalTransform
+        animation.duration = 0.2
+        node.addAnimation(animation, forKey: nil)
+    }
+    
     private func rotateNode(_ node: SCNNode, aboutSceneAxes sceneAxes: SCNVector3) {
         let nodeAxes = scnScene.rootNode.convertVector(sceneAxes, to: selectedShapeNode)
         
@@ -282,61 +284,15 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         animation.duration = 0.2
         node.addAnimation(animation, forKey: nil)
     }
-    
-    private func getGridOfPoints(number: Int) -> [SCNVector3] {
-        var points = [SCNVector3]()
-        let maxCol = 3
-        let topRowY = 3
-        var count = 0
-        repeat {
-            for col in 0..<maxCol {
-                let row = Int(count / maxCol)
-                let point = SCNVector3(Double(col - maxCol / 2) * 3 * Constants.blockSpacing,
-                                       Double(topRowY - row) * 3 * Constants.blockSpacing,
-                                       0)
-                points.append(point)
-                count += 1
-            }
-        } while count < number
-        
-        return points
-    }
-    
-    // compute equally-spaced positions around a 3D circle at y = tablePositionY
+
+    // compute equally-spaced positions around a 3D circle on the table
     private func getEvenlySpacedCircularPoints(number: Int, radius: Double) -> [SCNVector3] {
         var points = [SCNVector3]()
         for n in 0..<number {
-            let theta = 2 * Double.pi * Double(n) / Double(number)
-            points.append(SCNVector3(radius * cos(theta), Constants.tablePositionY + (Constants.tableThickness + Constants.blockSize) / 2, radius * sin(theta)))
-        }
-        return points
-    }
-    
-    // compute equally-spaced positions around a 3D ellipse at z = 0
-    private func getEvenlySpacedEllipticalPoints(number: Int, horizontalRadius a: Double, verticalRadius b: Double) -> [SCNVector3] {
-        var points = [SCNVector3]()
-        let circumference = 1.85 * Double.pi * sqrt((a * a + b * b) / 2) // reasonable approximation (no exact solution)
-        // Note: will have less than "number" shapes, if circumference is over-estimated
-        let desiredSpacing = circumference / Double(number)
-        let resolution = 200  // check every 1.8 deg for next position with desired spacing
-        var pastX = 10.0
-        var pastY = 10.0
-        var count = 0
-        for n in 0..<resolution {
-            let theta = Double(n) * 2 * Double.pi / Double(resolution)
-            let sinT2 = pow(sin(theta), 2)
-            let cosT2 = pow(cos(theta), 2)
-            let radius = a * b / sqrt(a * a * sinT2 + b * b * cosT2)
-            let x = radius * cos(theta)
-            let y = radius * sin(theta)
-            let spacing = sqrt(pow((x - pastX), 2) + pow(y - pastY, 2))
-            if spacing > desiredSpacing {
-                points.append(SCNVector3(radius * cos(theta), radius * sin(theta), 0))
-                count += 1
-                if count == number { break }
-                pastX = x
-                pastY = y
-            }
+            let theta = 2 * Double.pi * Double(n) / Double(number)  // zero at +x axis, positive clockwise around -y axis
+            points.append(SCNVector3(radius * cos(theta),
+                                     Constants.tablePositionY + (Constants.tableThickness + Constants.blockSize) / 2,
+                                     radius * sin(theta)))
         }
         return points
     }
