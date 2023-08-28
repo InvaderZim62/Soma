@@ -161,7 +161,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
                 // single-tap: clockwise, double-tap counter-clockwise
                 let cameraAxis = recognizer.numberOfTapsRequired == 1 ? pov.worldFront : -pov.worldFront
                 let shapeAxis = scnScene.rootNode.convertVector(cameraAxis, to: selectedShapeNode)
-                rotateNode(tappedShapeNode, aboutAxis: shapeAxis)
+                rotateNode(tappedShapeNode, aboutAxis: shapeAxis.closestPrimaryDirection)
             } else {
                 // new shape tapped (select it)
                 selectedShapeNode = tappedShapeNode
@@ -190,7 +190,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
             }
             
             let shapeAxis = scnScene.rootNode.convertVector(cameraAxis, to: selectedShapeNode)
-            rotateNode(selectedShapeNode, aboutAxis: shapeAxis)
+            rotateNode(selectedShapeNode, aboutAxis: shapeAxis.closestPrimaryDirection)
         }
     }
     
