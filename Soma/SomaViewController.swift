@@ -11,25 +11,33 @@
 //      /
 //     z (blue)
 //
+//  Rotating node about camera axis
+//  -------------------------------
+//  if let pov = scnView.pointOfView {
+//      let cameraAxis = pov.worldRight  // x: worldRight, y: worldUp, z: worldFront
+//      let nodeAxis = scnScene.rootNode.convertVector(cameraAxis, to: myNode)
+//      rotateNode(myNode, aboutAxis: nodeAxis)
+//  }
+//
 //  Animating node rotation
 //  -----------------------
 //  The following line correctly converts a 3-axis rotation (SCNVector3) from scene coordinates to node coordinates,
 //  but different methods of using nodeRotation give different results
 //      let nodeRotation = scnScene.rootNode.convertVector(sceneRotation, to: selectedShapeNode)
 //      -or-
-//      let nodeAxes = scnScene.rootNode.convertVector(sceneAxes, to: selectedShapeNode), where sceneAxes and nodeAxes are unit vectors
+//      let nodeAxis = scnScene.rootNode.convertVector(sceneAxis, to: selectedShapeNode), where sceneAxis and nodeAxis are unit vectors
 //
 //  Method 1:
 //  The following line of code is the simplest method of animation, be doesn't always work.  It seems to suffer from gimbal lock.
 //      selectedShapeNode.runAction(SCNAction.rotateBy(x: CGFloat(nodeRotation.x), y: CGFloat(nodeRotation.y), z: CGFloat(nodeRotation.z), duration: 0.2))
 //
 //  This line of code doesn't suffer from gimbal lock, but isn't animated
-//      selectedShapeNode.transform = SCNMatrix4Rotate(selectedShapeNode.transform, .pi/2, nodeAxes.x, nodeAxes.y, nodeAxes.z)
+//      selectedShapeNode.transform = SCNMatrix4Rotate(selectedShapeNode.transform, .pi/2, nodeAxis.x, nodeAxis.y, nodeAxis.z)
 //
 //  Method 2:
 //  The following animates the rotation (using presentation layer), but snaps back to the model layer (unchanged) when done
 //      let animation = CABasicAnimation(keyPath: "transform")
-//      animation.toValue = SCNMatrix4Rotate(selectedShapeNode.transform, .pi/2, nodeAxes.x, nodeAxes.y, nodeAxes.z)
+//      animation.toValue = SCNMatrix4Rotate(selectedShapeNode.transform, .pi/2, nodeAxis.x, nodeAxis.y, nodeAxis.z)
 //      animation.duration = 1
 //      selectedShapeNode.addAnimation(animation, forKey: nil)
 //
@@ -38,7 +46,7 @@
 //  It's from this blog post: https://oleb.net/blog/2012/11/prevent-caanimation-snap-back
 //  It changes the model layer before launching the animation on the presentation layer starting from the original orientation.
 //      let originalTransform = selectedShapeNode.transform
-//      selectedShapeNode.transform = SCNMatrix4Rotate(selectedShapeNode.transform, .pi/2, nodeAxes.x, nodeAxes.y, nodeAxes.z)
+//      selectedShapeNode.transform = SCNMatrix4Rotate(selectedShapeNode.transform, .pi/2, nodeAxis.x, nodeAxis.y, nodeAxis.z)
 //      let animation = CABasicAnimation(keyPath: "transform")
 //      animation.fromValue = originalTransform
 //      animation.duration = 0.2
@@ -152,7 +160,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     // MARK: - Gesture Recognizers
     
-    // make tapped shape the selected shape, or rotate about camera z-axis, if already selected
+    // make tapped shape the selected shape, or rotate about primary axis closest to camera z-axis, if already selected
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
         let location = recognizer.location(in: scnView)
         if let tappedShapeNode = getShapeNodeAt(location), let pov = scnView.pointOfView {
@@ -172,7 +180,8 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    // rotate selected shape 90 degrees at a time (vertical pan about camera x-axis, lateral pan about camera y-axis)
+    // rotate selected shape 90 degrees at a time (vertical pan about primary axis closest
+    // to camera x-axis, lateral pan about primary axis closest to camera y-axis)
     @objc func handleSwipe(recognizer: UISwipeGestureRecognizer) {
         if let selectedShapeNode, let pov = scnView.pointOfView {
             var cameraAxis: SCNVector3
