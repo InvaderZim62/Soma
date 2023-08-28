@@ -160,16 +160,15 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     // MARK: - Gesture Recognizers
     
-    // make tapped shape the selected shape, or rotate about primary axis closest to camera z-axis, if already selected
+    // make tapped shape the selected shape, or move in direction of tapped arrow, if already selected
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
         let location = recognizer.location(in: scnView)
-        if let tappedShapeNode = getShapeNodeAt(location), let pov = scnView.pointOfView {
+        if let tappedArrow = getArrowNodeAt(location), let shapeNode = tappedArrow.parent {
+            moveNode(shapeNode, inDirection: tappedArrow.direction)
+        } else if let tappedShapeNode = getShapeNodeAt(location) {
             if tappedShapeNode == selectedShapeNode {
-                // selected shape tapped again (rotate 90 degrees about camera z-axis)
-                // single-tap: clockwise, double-tap counter-clockwise
-                let cameraAxis = recognizer.numberOfTapsRequired == 1 ? pov.worldFront : -pov.worldFront
-                let shapeAxis = scnScene.rootNode.convertVector(cameraAxis, to: selectedShapeNode)
-                rotateNode(tappedShapeNode, aboutAxis: shapeAxis.closestPrimaryDirection)
+                // selected node tapped (deselect it)
+                selectedShapeNode = nil
             } else {
                 // new shape tapped (select it)
                 selectedShapeNode = tappedShapeNode
@@ -270,6 +269,38 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         return shapeNode
     }
     
+    // get arrow node at location provided by tap gesture (nil if none tapped)
+    private func getArrowNodeAt(_ location: CGPoint) -> ArrowNode? {
+        var arrowNode: ArrowNode?
+        let hitResults = scnView.hitTest(location, options: nil)  // nil returns closest hit
+        if let result = hitResults.first(where: { $0.node.name == "Arrow Node" }) {
+            arrowNode = result.node as? ArrowNode
+        }
+        return arrowNode
+    }
+    
+    // move node relative to table, in node's local direction
+    private func moveNode(_ node: SCNNode, inDirection direction: ArrowDirection) {
+        var deltaPositionShapeAxis: SCNVector3!
+        let offset = Float(Constants.blockSpacing)
+        switch direction {
+        case .right:
+            deltaPositionShapeAxis = SCNVector3(x: offset, y: 0, z: 0)
+        case .left:
+            deltaPositionShapeAxis = SCNVector3(x: -offset, y: 0, z: 0)
+        case .up:
+            deltaPositionShapeAxis = SCNVector3(x: 0, y: offset, z: 0)
+        case .down:
+            deltaPositionShapeAxis = SCNVector3(x: 0, y: -offset, z: 0)
+        case .front:
+            deltaPositionShapeAxis = SCNVector3(x: 0, y: 0, z: offset)
+        case .back:
+            deltaPositionShapeAxis = SCNVector3(x: 0, y: 0, z: -offset)
+        }
+        let deltaPositionTableAxis = node.convertVector(deltaPositionShapeAxis, to: tableNode)
+        node.position += deltaPositionTableAxis
+    }
+
     private func rotateNode(_ node: SCNNode, aboutAxis nodeAxis: SCNVector3) {
         // the following is a trick to animate the rotation, and not have it snap back to its original orientation
         // from: https://oleb.net/blog/2012/11/prevent-caanimation-snap-back

@@ -174,6 +174,7 @@ class ShapeNode: SCNNode {
     
     private func addArrowNode(direction: ArrowDirection, color: UIColor) {
         let arrowNode = ArrowNode(color: color)
+        arrowNode.direction = direction
         let offset = arrowOffset[direction]!
         switch direction {
         case .right:
