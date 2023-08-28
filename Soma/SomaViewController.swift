@@ -208,21 +208,21 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
             recognizer.state = .failed  // force my pan gesture to fail, so camera's pan gesture can take over
             return
         }
-        if let pannedShapeNode = selectedShapeNode {
-            let location = recognizer.location(in: scnView)  // absolute 2D screen coordinates
-            let translation = recognizer.translation(in: scnView)  // relative (to start of pan) 2D screen coordinates
-            let hitResults = scnView.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
-            print("location: \(location), translation: \(translation)")
-            if let result = hitResults.first {
-                // TBD
-            }
-            
-//            switch recognizer.state {
-//            case .changed:
-//            default:
-//                break
+//        if let pannedShapeNode = selectedShapeNode {
+//            let location = recognizer.location(in: scnView)  // absolute 2D screen coordinates
+//            let translation = recognizer.translation(in: scnView)  // relative (to start of pan) 2D screen coordinates
+//            let hitResults = scnView.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
+//            print("location: \(location), translation: \(translation)")
+//            if let result = hitResults.first {
+//                // TBD
 //            }
-        }
+//            
+////            switch recognizer.state {
+////            case .changed:
+////            default:
+////                break
+////            }
+//        }
     }
 
     // MARK: - UIGestureRecognizerDelegate
