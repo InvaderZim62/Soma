@@ -63,7 +63,7 @@ struct Constants {
     static let tableSize: CGFloat = 12 * blockSpacing
     static let tableThickness: CGFloat = 0.05 * tableSize
     static let tablePositionY: CGFloat = -3 * blockSpacing
-    static let cameraDistance: Float = 24 * Float(Constants.blockSpacing)
+    static let cameraDistance: Float = 20 * Float(Constants.blockSpacing)
 }
 
 class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
@@ -263,18 +263,21 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     private func getShapeNodeAt(_ location: CGPoint) -> ShapeNode? {
         var shapeNode: ShapeNode?
         let hitResults = scnView.hitTest(location, options: nil)  // nil returns closest hit
-        if let result = hitResults.first(where: { $0.node.parent?.name == "Shape Node" }) {
+        if let result = hitResults.first(where: { $0.node.parent?.name == "Shape Node" }) {  // note: result is a BlockNode (parent is ShapeNode)
             shapeNode = result.node.parent as? ShapeNode
         }
         return shapeNode
     }
     
-    // get arrow node at location provided by tap gesture (nil if none tapped)
+    // get arrow node at location provided by tap gesture (nil if none tapped, or if not visible)
     private func getArrowNodeAt(_ location: CGPoint) -> ArrowNode? {
         var arrowNode: ArrowNode?
         let hitResults = scnView.hitTest(location, options: nil)  // nil returns closest hit
         if let result = hitResults.first(where: { $0.node.name == "Arrow Node" }) {
             arrowNode = result.node as? ArrowNode
+            if let arrowNode, !arrowNode.isVisible {
+                return nil
+            }
         }
         return arrowNode
     }

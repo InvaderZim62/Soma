@@ -8,6 +8,11 @@
 import UIKit
 import SceneKit
 
+struct ArrowConst {
+    static let radius = 0.5
+    static let height = 2 * radius
+}
+
 enum ArrowDirection: CaseIterable {
     case right, left, up, down, front, back
     
@@ -32,11 +37,12 @@ enum ArrowDirection: CaseIterable {
 class ArrowNode: SCNNode {
     
     var direction = ArrowDirection.right
+    var isVisible = false
     
     init(color: UIColor) {
         super.init()
         name = "Arrow Node"
-        geometry = SCNCone(topRadius: 0, bottomRadius: 0.25, height: 0.5)
+        geometry = SCNCone(topRadius: 0, bottomRadius: ArrowConst.radius, height: ArrowConst.height)
         setColorTo(color)
         physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
     }
@@ -47,5 +53,6 @@ class ArrowNode: SCNNode {
     
     func setColorTo(_ color: UIColor) {
         geometry?.firstMaterial?.diffuse.contents = color
+        isVisible = color != .clear
     }
 }
