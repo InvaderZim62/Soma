@@ -9,6 +9,14 @@ import UIKit
 import SceneKit
 
 extension SCNVector3 {
+    static func +(lhs: SCNVector3, rhs: SCNVector3) -> SCNVector3 {
+        return SCNVector3(x: lhs.x + rhs.x, y: lhs.y + rhs.y, z: lhs.z + rhs.z)
+    }
+    
+    static func -(lhs: SCNVector3, rhs: SCNVector3) -> SCNVector3 {
+        return SCNVector3(x: lhs.x - rhs.x, y: lhs.y - rhs.y, z: lhs.z - rhs.z)
+    }
+
     static prefix func -(rhs: SCNVector3) -> SCNVector3 {
         SCNVector3(x: -rhs.x, y: -rhs.y, z: -rhs.z)
     }

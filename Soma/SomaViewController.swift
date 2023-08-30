@@ -63,7 +63,7 @@ struct Constants {
     static let tableSize: CGFloat = 12 * blockSpacing
     static let tableThickness: CGFloat = 0.05 * tableSize
     static let tablePositionY: CGFloat = -3 * blockSpacing
-    static let cameraDistance: Float = 24 * Float(Constants.blockSpacing)
+    static let cameraDistance: Float = 22 * Float(Constants.blockSpacing)
 }
 
 class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
@@ -84,6 +84,8 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     var pastSelectedShapeNode: ShapeNode?
     var startingPositions = [SCNVector3]()
+    var initialTableCoordinates = SCNVector3Zero  // used in handlePan
+    var initialShapePosition = SCNVector3Zero
 
     override var prefersStatusBarHidden: Bool {
         return true
@@ -202,27 +204,97 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
             rotateNode(selectedShapeNode, aboutAxis: shapeAxis.closestPrimaryDirection)
         }
     }
-    
+
+    // this version sets delta position of shape to delta pan (finger doesn't have to start on shape)
     @objc func handlePan(recognizer: UIPanGestureRecognizer) {
         if selectedShapeNode == nil {
             recognizer.state = .failed  // force my pan gesture to fail, so camera's pan gesture can take over
             return
         }
+        let location = recognizer.location(in: scnView)  // absolute 2D screen coordinates
         if let pannedShapeNode = selectedShapeNode {
-            let location = recognizer.location(in: scnView)  // absolute 2D screen coordinates
-            let translation = recognizer.translation(in: scnView)  // relative (to start of pan) 2D screen coordinates
-            let hitResults = scnView.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
-            print("location: \(location), translation: \(translation)")
-            if let result = hitResults.first {
-                // TBD
+            switch recognizer.state {
+            case .began:
+                if let tableCoordinates = getTableCoordinatesAt(location) {
+                    initialTableCoordinates = tableCoordinates
+                }
+                initialShapePosition = pannedShapeNode.position
+            case .changed:
+                // move pannedShapeNode to pan location, in plane of table
+                if let tableCoordinates = getTableCoordinatesAt(location) {
+                    let deltaTableCoordinates = tableCoordinates - initialTableCoordinates
+
+                    let snappedX = snap(CGFloat(deltaTableCoordinates.x), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
+                    let snappedZ = snap(CGFloat(deltaTableCoordinates.z), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
+                    let snappedDelta = SCNVector3(x: Float(snappedX), y: deltaTableCoordinates.y, z: Float(snappedZ))
+
+                    pannedShapeNode.position = initialShapePosition + snappedDelta
+                }
+            case .ended, .cancelled:
+                // when done moving, snap to nearest point by setting deadband = half range
+                if let tableCoordinates = getTableCoordinatesAt(location) {
+                    let deltaTableCoordinates = tableCoordinates - initialTableCoordinates
+
+                    let snappedX = snap(CGFloat(deltaTableCoordinates.x), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
+                    let snappedZ = snap(CGFloat(deltaTableCoordinates.z), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
+                    let snappedDelta = SCNVector3(x: Float(snappedX), y: deltaTableCoordinates.y, z: Float(snappedZ))
+
+                    pannedShapeNode.position = initialShapePosition + snappedDelta
+                }
+            default:
+                break
             }
-            
+        }
+    }
+
+//    // this version sets position of shape at location of pan (will initially jump, if finger doesn't start at shape's origin)
+//    @objc func handlePan(recognizer: UIPanGestureRecognizer) {
+//        if selectedShapeNode == nil {
+//            recognizer.state = .failed  // force my pan gesture to fail, so camera's pan gesture can take over
+//            return
+//        }
+//        let location = recognizer.location(in: scnView)  // absolute 2D screen coordinates
+//        if let pannedShapeNode = selectedShapeNode {
 //            switch recognizer.state {
 //            case .changed:
+//                // move pannedShapeNode to pan location, in plane of table
+//                if let tableCoordinates = getTableCoordinatesAt(location) {
+//                    print(tableCoordinates)
+//                    let snappedX = snap(CGFloat(tableCoordinates.x), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
+//                    let snappedZ = snap(CGFloat(tableCoordinates.z), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
+//                    let snappedCoordinates = SCNVector3(x: Float(snappedX), y: tableCoordinates.y, z: Float(snappedZ))
+//
+//                    pannedShapeNode.position = tableNode.position + snappedCoordinates + SCNVector3(x: 0, y: Float(Constants.blockSize) / 2, z: 0)
+//                }
 //            default:
 //                break
 //            }
+//        }
+//    }
+
+    // convert from screen to table coordinates
+    private func getTableCoordinatesAt(_ location: CGPoint) -> SCNVector3? {
+        var tableCoordinates: SCNVector3?
+        let hitResults = scnView.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
+        if let result = hitResults.first(where: { $0.node.name == "Table Node" }) {
+            tableCoordinates = result.localCoordinates
         }
+        return tableCoordinates
+    }
+
+    // value: continuous input
+    // step: quantized output
+    // deadband: amount value must change before output begins to change; also output jumps to next step when within deadband distance of it
+    // offset: offset of origin of steps
+    private func snap(_ value: CGFloat, to step: CGFloat, deadband: CGFloat, offset: CGFloat) -> CGFloat {
+        var snappedValue = value
+        let wrap = (value - offset).truncatingRemainder(dividingBy: step)  // modulo step
+        if abs(wrap) < deadband {
+            snappedValue -= wrap
+        } else if abs(wrap) > step - deadband {
+            snappedValue += (value - offset < 0 ? -1 : 1) * step - wrap
+        }
+        return snappedValue
     }
 
     // MARK: - UIGestureRecognizerDelegate
@@ -294,14 +366,17 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         node.addAnimation(animation, forKey: nil)
     }
 
-    // compute equally-spaced positions around a 3D circle on the table
+    // compute equally-spaced positions around a 3D circle on the table (snapped to whole block size increments)
     private func getEvenlySpacedCircularPoints(number: Int, radius: Double) -> [SCNVector3] {
         var points = [SCNVector3]()
         for n in 0..<number {
             let theta = 2 * Double.pi * Double(n) / Double(number)  // zero at +x axis, positive clockwise around -y axis
-            points.append(SCNVector3(radius * cos(theta),
-                                     Constants.tablePositionY + (Constants.tableThickness + Constants.blockSize) / 2,
-                                     radius * sin(theta)))
+            let point = SCNVector3(radius * cos(theta),
+                                   Constants.tablePositionY + (Constants.tableThickness + Constants.blockSize) / 2,
+                                   radius * sin(theta))
+            let snappedX = snap(CGFloat(point.x), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
+            let snappedZ = snap(CGFloat(point.z), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
+            points.append(SCNVector3(x: Float(snappedX), y: point.y, z: Float(snappedZ)))
         }
         return points
     }
