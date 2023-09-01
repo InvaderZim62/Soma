@@ -74,7 +74,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     let tableNode = TableNode(color: UIColor.brown)
     let wallXNode = WallNode(color: .lightGray)
     let wallZNode = WallNode(color: .lightGray)
-    let wallX2Node = WallNode(color: .clear)
+    let wallX2Node = WallNode(color: .clear)  // pws: move some of these into createWalls, if they are not needed globally
     let wallZ2Node = WallNode(color: .clear)
     var shapeNodes = [String: ShapeNode]()  // [ShapeType: ShapeNode]
     var selectedShapeNode: ShapeNode? {
@@ -156,7 +156,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     private func createWallNodes() {
-        // add opaque walls in back, to use for panning location coordinates
+        // add opaque walls in back, to use for determining panning location coordinates
         wallXNode.transform = SCNMatrix4Rotate(wallXNode.transform, .pi / 2, 0, 1, 0)  // rotate before setting position
 //        wallXNode.position = SCNVector3(-Constants.tableSize / 2, Constants.tableSize / 4 + Constants.tableThickness / 2, 0)  // use for upper-half-walls
         wallXNode.position = SCNVector3(-Constants.tableSize / 2, 0, 0)
@@ -164,10 +164,12 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         wallZNode.position = SCNVector3(0, 0, -Constants.tableSize / 2)
         scnScene.rootNode.addChildNode(wallZNode)
 
-        // add invisible walls in front and right, to keep center of rotation of camera at center of table
+        // add invisible walls in front and right, as a trick to keep center of rotation of camera at center of table
+        wallX2Node.name = "Invisible Wall"
         wallX2Node.transform = SCNMatrix4Rotate(wallX2Node.transform, .pi / 2, 0, 1, 0)  // rotate before setting position
         wallX2Node.position = SCNVector3(Constants.tableSize / 2, 0, 0)
         scnScene.rootNode.addChildNode(wallX2Node)
+        wallZ2Node.name = "Invisible Wall"
         wallZ2Node.position = SCNVector3(0, 0, Constants.tableSize / 2)
         scnScene.rootNode.addChildNode(wallZ2Node)
     }
@@ -246,8 +248,9 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
                     let deltaTableCoordinates = tableCoordinates - initialTableCoordinates
 
                     let snappedX = snap(CGFloat(deltaTableCoordinates.x), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
+                    let snappedY = snap(CGFloat(deltaTableCoordinates.y), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
                     let snappedZ = snap(CGFloat(deltaTableCoordinates.z), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
-                    let snappedDelta = SCNVector3(x: Float(snappedX), y: deltaTableCoordinates.y, z: Float(snappedZ))
+                    let snappedDelta = SCNVector3(x: Float(snappedX), y: Float(snappedY), z: Float(snappedZ))
 
                     pannedShapeNode.position = initialShapePosition + snappedDelta
                 }
@@ -257,8 +260,9 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
                     let deltaTableCoordinates = tableCoordinates - initialTableCoordinates
 
                     let snappedX = snap(CGFloat(deltaTableCoordinates.x), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
+                    let snappedY = snap(CGFloat(deltaTableCoordinates.y), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
                     let snappedZ = snap(CGFloat(deltaTableCoordinates.z), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
-                    let snappedDelta = SCNVector3(x: Float(snappedX), y: deltaTableCoordinates.y, z: Float(snappedZ))
+                    let snappedDelta = SCNVector3(x: Float(snappedX), y: Float(snappedY), z: Float(snappedZ))
 
                     pannedShapeNode.position = initialShapePosition + snappedDelta
                 }
@@ -267,38 +271,16 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
             }
         }
     }
-
-//    // this version sets position of shape at location of pan (will initially jump, if finger doesn't start at shape's origin)
-//    @objc func handlePan(recognizer: UIPanGestureRecognizer) {
-//        if selectedShapeNode == nil {
-//            recognizer.state = .failed  // force my pan gesture to fail, so camera's pan gesture can take over
-//            return
-//        }
-//        let location = recognizer.location(in: scnView)  // absolute 2D screen coordinates
-//        if let pannedShapeNode = selectedShapeNode {
-//            switch recognizer.state {
-//            case .changed:
-//                // move pannedShapeNode to pan location, in plane of table
-//                if let tableCoordinates = getTableCoordinatesAt(location) {
-//                    print(tableCoordinates)
-//                    let snappedX = snap(CGFloat(tableCoordinates.x), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
-//                    let snappedZ = snap(CGFloat(tableCoordinates.z), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
-//                    let snappedCoordinates = SCNVector3(x: Float(snappedX), y: tableCoordinates.y, z: Float(snappedZ))
-//
-//                    pannedShapeNode.position = tableNode.position + snappedCoordinates + SCNVector3(x: 0, y: Float(Constants.blockSize) / 2, z: 0)
-//                }
-//            default:
-//                break
-//            }
-//        }
-//    }
-
+    
     // convert from screen to table coordinates
     private func getTableCoordinatesAt(_ location: CGPoint) -> SCNVector3? {
         var tableCoordinates: SCNVector3?
         let hitResults = scnView.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
-        if let result = hitResults.first(where: { $0.node.name == "Table Node" }) {
+        if let result = hitResults.first(where: { $0.node.name == "Table Node" }) {  // give preference to table node
             tableCoordinates = result.localCoordinates
+        } else if let result = hitResults.first(where: { $0.node.name == "Wall Node" }) {
+            let wallCoordinates = result.localCoordinates
+            tableCoordinates = result.node.convertPosition(wallCoordinates, to: tableNode)
         }
         return tableCoordinates
     }

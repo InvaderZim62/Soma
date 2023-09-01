@@ -16,7 +16,7 @@ class TableNode: SCNNode {
         geometry = SCNBox(width: Constants.tableSize,
                           height: Constants.tableThickness,
                           length: Constants.tableSize,
-                          //                          chamferRadius: Constants.tableThickness)
+//                          chamferRadius: Constants.tableThickness)
                           chamferRadius: 0)
         geometry?.firstMaterial?.diffuse.contents = color
         physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)

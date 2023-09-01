@@ -14,6 +14,10 @@ class WallNode: SCNNode {
         super.init()
         name = "Wall Node"
         geometry = SCNPlane(width: Constants.tableSize, height: Constants.tableSize)
+//        geometry = SCNBox(width: Constants.tableSize,
+//                          height: Constants.tableSize,
+//                          length: Constants.tableThickness,
+//                          chamferRadius: 0)
         geometry?.firstMaterial?.diffuse.contents = color
         geometry?.firstMaterial?.isDoubleSided = true
         physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
