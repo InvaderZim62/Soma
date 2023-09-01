@@ -10,14 +10,15 @@ import SceneKit
 
 class TableNode: SCNNode {
     
-    override init() {
+    init(color: UIColor) {
         super.init()
         name = "Table Node"
         geometry = SCNBox(width: Constants.tableSize,
                           height: Constants.tableThickness,
                           length: Constants.tableSize,
-                          chamferRadius: Constants.tableThickness)
-        geometry?.firstMaterial?.diffuse.contents = UIColor.brown
+                          //                          chamferRadius: Constants.tableThickness)
+                          chamferRadius: 0)
+        geometry?.firstMaterial?.diffuse.contents = color
         physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
     }
     
