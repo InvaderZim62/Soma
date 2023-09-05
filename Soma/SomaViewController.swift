@@ -76,6 +76,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     var scnView: SCNView!
 
     let tableNode = TableNode(color: UIColor.black.withAlphaComponent(0.5))
+    var shapeNodes = [String: ShapeNode]()  // [ShapeType: ShapeNode]
     var selectedShapeNode: ShapeNode? {
         didSet {
             pastSelectedShapeNode?.isHighlighted = false
@@ -99,9 +100,15 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         setupView()
         setupCamera()
         startingPositions = getEvenlySpacedCircularPoints(number: ShapeType.allCases.count, radius: 0.4 * Constants.tableSize)
-        createTableNode()
+//        createTableNode()
         createWallNodes()
-        createShapeNodes()
+//        createShapeNodes()
+        
+//        createFigure(.ottoman, color: .white)
+//        createFigure(.sofa, color: .white)
+//        createFigure(.bench)
+//        createFigure(.bed)
+        createFigure(.bathtub)
 
         // add tap gestures to select shape, or rotate selected shape about screen z-axis
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
@@ -169,10 +176,17 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         for (index, shape) in ShapeType.allCases.enumerated() {
             let shapeNode = ShapeNode(type: shape)
             shapeNode.position = startingPositions[index]
+            shapeNodes[shape.rawValue] = shapeNode
             scnScene.rootNode.addChildNode(shapeNode)
         }
     }
     
+    private func createFigure(_ type: FigureType, color: UIColor? = nil) {
+        let figureNode = FigureNode(type: type, color: color)
+        figureNode.position = SCNVector3Zero
+        scnScene.rootNode.addChildNode(figureNode)
+    }
+
     // MARK: - Gesture Recognizers
     
     // make tapped shape the selected shape, or rotate about primary axis closest to camera z-axis, if already selected
@@ -332,7 +346,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     private func getShapeNodeAt(_ location: CGPoint) -> ShapeNode? {
         var shapeNode: ShapeNode?
         let hitResults = scnView.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
-        if let result = hitResults.first(where: { $0.node.parent?.name == "Shape Node" }) {
+        if let result = hitResults.first(where: { $0.node.parent?.name == "Shape" }) {
             shapeNode = result.node.parent as? ShapeNode
         }
         return shapeNode
