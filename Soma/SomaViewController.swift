@@ -75,7 +75,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     var cameraNode: SCNNode!
     var scnView: SCNView!
 
-    let tableNode = TableNode(color: UIColor.brown)
+    let tableNode = TableNode(color: UIColor.black.withAlphaComponent(0.5))
     var shapeNodes = [String: ShapeNode]()  // [ShapeType: ShapeNode]
     var selectedShapeNode: ShapeNode? {
         didSet {
