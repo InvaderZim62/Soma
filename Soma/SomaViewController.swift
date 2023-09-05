@@ -61,8 +61,8 @@ struct Constants {
     static let blockSpacing: CGFloat = 1
     static let blockSize: CGFloat = 0.97 * Constants.blockSpacing  // slightly smaller, to prevent continuous contact detection
     static let tableSize: CGFloat = 12 * blockSpacing
-    static let tableThickness: CGFloat = 0.02 * tableSize
-    static let cameraDistance: Float = 24 * Float(Constants.blockSpacing)
+    static let tableThickness: CGFloat = 0.25
+    static let cameraDistance: Float = 23 * Float(Constants.blockSpacing)
 }
 
 enum WallType: String {
@@ -151,7 +151,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     private func createTableNode() {
-        tableNode.position = SCNVector3(0, 0, 0)
+        tableNode.position = SCNVector3(0, (Constants.blockSpacing - Constants.tableThickness) / 2, 0)
         scnScene.rootNode.addChildNode(tableNode)
     }
     
@@ -235,7 +235,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
                 }
                 initialShapePosition = pannedShapeNode.position
             case .changed:
-                // move pannedShapeNode to pan location, in plane of table
+                // move pannedShapeNode to pan location, in closest to perpendicular plane
                 if let tableCoordinates = getTableCoordinatesAt(location) {
                     let deltaTableCoordinates = tableCoordinates - initialTableCoordinates
                     let snappedDelta = snap3D(deltaTableCoordinates, to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
@@ -243,11 +243,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
                 }
             case .ended, .cancelled:
                 // when done moving, snap to nearest point by setting deadband = half range
-                if let tableCoordinates = getTableCoordinatesAt(location) {
-                    let deltaTableCoordinates = tableCoordinates - initialTableCoordinates
-                    let snappedDelta = snap3D(deltaTableCoordinates, to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
-                    pannedShapeNode.position = initialShapePosition + snappedDelta
-                }
+                pannedShapeNode.position = snap3D(pannedShapeNode.position, to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
             default:
                 break
             }
