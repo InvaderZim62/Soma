@@ -12,7 +12,7 @@ class TableNode: SCNNode {
     
     init(color: UIColor) {
         super.init()
-        name = "Table Node"
+        name = "Table"
         geometry = SCNBox(width: Constants.tableSize,
                           height: Constants.tableThickness,
                           length: Constants.tableSize,

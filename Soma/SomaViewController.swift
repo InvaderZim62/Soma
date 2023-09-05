@@ -65,6 +65,10 @@ struct Constants {
     static let cameraDistance: Float = 24 * Float(Constants.blockSpacing)
 }
 
+enum WallType: String {
+    case WallX, Table, WallZ
+}
+
 class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var scnScene: SCNScene!
@@ -72,10 +76,6 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     var scnView: SCNView!
 
     let tableNode = TableNode(color: UIColor.brown)
-    let wallXNode = WallNode(color: .lightGray)
-    let wallZNode = WallNode(color: .lightGray)
-    let wallX2Node = WallNode(color: .clear)  // pws: move some of these into createWalls, if they are not needed globally
-    let wallZ2Node = WallNode(color: .clear)
     var shapeNodes = [String: ShapeNode]()  // [ShapeType: ShapeNode]
     var selectedShapeNode: ShapeNode? {
         didSet {
@@ -156,22 +156,14 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     private func createWallNodes() {
-        // add opaque walls in back, to use for determining panning location coordinates
-        wallXNode.transform = SCNMatrix4Rotate(wallXNode.transform, .pi / 2, 0, 1, 0)  // rotate before setting position
-//        wallXNode.position = SCNVector3(-Constants.tableSize / 2, Constants.tableSize / 4 + Constants.tableThickness / 2, 0)  // use for upper-half-walls
-        wallXNode.position = SCNVector3(-Constants.tableSize / 2, 0, 0)
-        scnScene.rootNode.addChildNode(wallXNode)
-        wallZNode.position = SCNVector3(0, 0, -Constants.tableSize / 2)
-        scnScene.rootNode.addChildNode(wallZNode)
+        let wallNodeX = WallNode(name: WallType.WallX.rawValue, color: .clear)  // .lightGray.withAlphaComponent(0.3)
+        wallNodeX.transform = SCNMatrix4Rotate(wallNodeX.transform, .pi / 2, 0, 1, 0)  // rotate before setting position
+        wallNodeX.position = SCNVector3(0, 0, 0)
+        scnScene.rootNode.addChildNode(wallNodeX)
 
-        // add invisible walls in front and right, as a trick to keep center of rotation of camera at center of table
-        wallX2Node.name = "Invisible Wall"
-        wallX2Node.transform = SCNMatrix4Rotate(wallX2Node.transform, .pi / 2, 0, 1, 0)  // rotate before setting position
-        wallX2Node.position = SCNVector3(Constants.tableSize / 2, 0, 0)
-        scnScene.rootNode.addChildNode(wallX2Node)
-        wallZ2Node.name = "Invisible Wall"
-        wallZ2Node.position = SCNVector3(0, 0, Constants.tableSize / 2)
-        scnScene.rootNode.addChildNode(wallZ2Node)
+        let wallNodeZ = WallNode(name: WallType.WallZ.rawValue, color: .clear)
+        wallNodeZ.position = SCNVector3(0, 0, 0)
+        scnScene.rootNode.addChildNode(wallNodeZ)
     }
 
     private func createShapeNodes() {
@@ -272,17 +264,27 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    // convert from screen to table coordinates
+    // convert from screen to table coordinates, using appropriate backdrop wall/table
     private func getTableCoordinatesAt(_ location: CGPoint) -> SCNVector3? {
         var tableCoordinates: SCNVector3?
         let hitResults = scnView.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
-        if let result = hitResults.first(where: { $0.node.name == "Table Node" }) {  // give preference to table node
-            tableCoordinates = result.localCoordinates
-        } else if let result = hitResults.first(where: { $0.node.name == "Wall Node" }) {
+        if let result = hitResults.first(where: { $0.node.name == wallMostPerpendicularToCamera.rawValue }) {
             let wallCoordinates = result.localCoordinates
             tableCoordinates = result.node.convertPosition(wallCoordinates, to: tableNode)
         }
         return tableCoordinates
+    }
+    
+    // return wall node type most perpendicular to camera point of view
+    var wallMostPerpendicularToCamera: WallType {
+        if let cameraAxis = scnView.pointOfView?.worldFront {
+            if abs(cameraAxis.x) > abs(cameraAxis.y) && abs(cameraAxis.x) > abs(cameraAxis.z) {
+                return .WallX
+            } else if abs(cameraAxis.y) > abs(cameraAxis.x) && abs(cameraAxis.y) > abs(cameraAxis.z) {
+                return .Table
+            }
+        }
+        return .WallZ
     }
 
     // value: continuous input
@@ -327,8 +329,8 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     private func setupCamera() {
         cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
-        let cameraAngle: Float = 40 * .pi / 180  // position camera 40 degrees above horizon
-        cameraNode.position = SCNVector3(0, Constants.cameraDistance * sin(cameraAngle), Constants.cameraDistance * cos(cameraAngle) + 4)
+        let cameraAngle: Float = 60 * .pi / 180  // position camera 60 degrees above horizon
+        cameraNode.position = SCNVector3(0, Constants.cameraDistance * sin(cameraAngle), Constants.cameraDistance * cos(cameraAngle))
         cameraNode.constraints = [SCNLookAtConstraint(target: tableNode)]  // point camera at center of table
         scnScene.rootNode.addChildNode(cameraNode)
     }

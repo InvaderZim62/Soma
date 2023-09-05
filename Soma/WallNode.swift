@@ -10,14 +10,10 @@ import SceneKit
 
 class WallNode: SCNNode {
     
-    init(color: UIColor) {
+    init(name: String, color: UIColor) {
         super.init()
-        name = "Wall Node"
+        self.name = name
         geometry = SCNPlane(width: Constants.tableSize, height: Constants.tableSize)
-//        geometry = SCNBox(width: Constants.tableSize,
-//                          height: Constants.tableSize,
-//                          length: Constants.tableThickness,
-//                          chamferRadius: 0)
         geometry?.firstMaterial?.diffuse.contents = color
         geometry?.firstMaterial?.isDoubleSided = true
         physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
