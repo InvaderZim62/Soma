@@ -133,7 +133,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // add pan gesture to move selected shape around screen
         let pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
-        pan.delegate = self  // allows system to call gestureRecognizer (bottom of file); requires SomaViewController conforms to UIGestureRecognizerDelegate
+        pan.delegate = self  // allows system to call gestureRecognizer, below; requires SomaViewController conforms to UIGestureRecognizerDelegate
         pan.require(toFail: swipeUp)  // must pan node slowly or diagonally, for swipe to fail
         pan.require(toFail: swipeDown)
         pan.require(toFail: swipeLeft)
@@ -220,7 +220,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
 
-    // this version sets delta position of shape to delta pan (finger doesn't have to start on shape)
+    // set delta position of shape to delta pan (finger doesn't have to start on shape)
     @objc func handlePan(recognizer: UIPanGestureRecognizer) {
         if selectedShapeNode == nil {
             recognizer.state = .failed  // force my pan gesture to fail, so camera's pan gesture can take over
@@ -238,24 +238,14 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
                 // move pannedShapeNode to pan location, in plane of table
                 if let tableCoordinates = getTableCoordinatesAt(location) {
                     let deltaTableCoordinates = tableCoordinates - initialTableCoordinates
-
-                    let snappedX = snap(CGFloat(deltaTableCoordinates.x), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
-                    let snappedY = snap(CGFloat(deltaTableCoordinates.y), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
-                    let snappedZ = snap(CGFloat(deltaTableCoordinates.z), to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
-                    let snappedDelta = SCNVector3(x: Float(snappedX), y: Float(snappedY), z: Float(snappedZ))
-
+                    let snappedDelta = snap3D(deltaTableCoordinates, to: Constants.blockSpacing, deadband: 0.2 * Constants.blockSpacing, offset: 0)
                     pannedShapeNode.position = initialShapePosition + snappedDelta
                 }
             case .ended, .cancelled:
                 // when done moving, snap to nearest point by setting deadband = half range
                 if let tableCoordinates = getTableCoordinatesAt(location) {
                     let deltaTableCoordinates = tableCoordinates - initialTableCoordinates
-
-                    let snappedX = snap(CGFloat(deltaTableCoordinates.x), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
-                    let snappedY = snap(CGFloat(deltaTableCoordinates.y), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
-                    let snappedZ = snap(CGFloat(deltaTableCoordinates.z), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
-                    let snappedDelta = SCNVector3(x: Float(snappedX), y: Float(snappedY), z: Float(snappedZ))
-
+                    let snappedDelta = snap3D(deltaTableCoordinates, to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
                     pannedShapeNode.position = initialShapePosition + snappedDelta
                 }
             default:
@@ -287,10 +277,17 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         return .WallZ
     }
 
-    // value: continuous input
+    // vector: continuous input
     // step: quantized output
     // deadband: amount value must change before output begins to change; also output jumps to next step when within deadband distance of it
     // offset: offset of origin of steps
+    private func snap3D(_ vector: SCNVector3, to step: CGFloat, deadband: CGFloat, offset: CGFloat) -> SCNVector3 {
+        let snappedX = snap(CGFloat(vector.x), to: step, deadband: deadband, offset: offset)
+        let snappedY = snap(CGFloat(vector.y), to: step, deadband: deadband, offset: offset)
+        let snappedZ = snap(CGFloat(vector.z), to: step, deadband: deadband, offset: offset)
+        return SCNVector3(x: Float(snappedX), y: Float(snappedY), z: Float(snappedZ))
+    }
+    
     private func snap(_ value: CGFloat, to step: CGFloat, deadband: CGFloat, offset: CGFloat) -> CGFloat {
         var snappedValue = value
         let wrap = (value - offset).truncatingRemainder(dividingBy: step)  // modulo step
@@ -366,9 +363,8 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
             let point = SCNVector3(radius * cos(theta),
                                    (Constants.tableThickness + Constants.blockSize) / 2,
                                    radius * sin(theta))
-            let snappedX = snap(CGFloat(point.x), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
-            let snappedZ = snap(CGFloat(point.z), to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
-            points.append(SCNVector3(x: Float(snappedX), y: point.y, z: Float(snappedZ)))
+            let snappedPoint = snap3D(point, to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
+            points.append(snappedPoint)
         }
         return points
     }
