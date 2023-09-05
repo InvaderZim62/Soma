@@ -59,7 +59,7 @@ import SceneKit
 
 struct Constants {
     static let blockSpacing: CGFloat = 1
-    static let blockSize: CGFloat = 0.97 * Constants.blockSpacing  // slightly smaller, to prevent continuous contact detection
+    static let blockSize: CGFloat = 0.97 * Constants.blockSpacing  // slightly smaller, to prevent continuous contact detection (not yet used)
     static let tableSize: CGFloat = 12 * blockSpacing
     static let tableThickness: CGFloat = 0.25
     static let cameraDistance: Float = 23 * Float(Constants.blockSpacing)
@@ -76,7 +76,6 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     var scnView: SCNView!
 
     let tableNode = TableNode(color: UIColor.black.withAlphaComponent(0.5))
-    var shapeNodes = [String: ShapeNode]()  // [ShapeType: ShapeNode]
     var selectedShapeNode: ShapeNode? {
         didSet {
             pastSelectedShapeNode?.isHighlighted = false
@@ -170,7 +169,6 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         for (index, shape) in ShapeType.allCases.enumerated() {
             let shapeNode = ShapeNode(type: shape)
             shapeNode.position = startingPositions[index]
-            shapeNodes[shape.rawValue] = shapeNode
             scnScene.rootNode.addChildNode(shapeNode)
         }
     }
