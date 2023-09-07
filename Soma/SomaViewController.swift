@@ -75,6 +75,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     var cameraNode: SCNNode!
     var scnView: SCNView!
 
+    var hud = Hud()
     let tableNode = TableNode(color: UIColor.black.withAlphaComponent(0.5))
     var shapeNodes = [String: ShapeNode]()  // [ShapeType: ShapeNode]
     var selectedShapeNode: ShapeNode? {
@@ -99,16 +100,17 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         setupScene()
         setupView()
         setupCamera()
+        setupHud()
         startingPositions = getEvenlySpacedCircularPoints(number: ShapeType.allCases.count, radius: 0.4 * Constants.tableSize)
-//        createTableNode()
+        createTableNode()
         createWallNodes()
-//        createShapeNodes()
+        createShapeNodes()
         
 //        createFigure(.ottoman, color: .white)
 //        createFigure(.sofa, color: .white)
-//        createFigure(.bench)
-//        createFigure(.bed)
-        createFigure(.bathtub)
+//        createFigure(.bench, color: .lightGray)//.withAlphaComponent(0.3))
+//        createFigure(.bed, color: .white)
+//        createFigure(.bathtub, color: .white)
 
         // add tap gestures to select shape, or rotate selected shape about screen z-axis
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
@@ -183,7 +185,8 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private func createFigure(_ type: FigureType, color: UIColor? = nil) {
         let figureNode = FigureNode(type: type, color: color)
-        figureNode.position = SCNVector3Zero
+//        figureNode.position = SCNVector3(x: 0, y: 6, z: 0)  // float figure above board
+//        figureNode.scale = SCNVector3(x: 1, y: 1, z: 1) * 0.4  // shrink figure
         scnScene.rootNode.addChildNode(figureNode)
     }
 
@@ -306,14 +309,14 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         }
         return snappedValue
     }
-
+    
     // MARK: - UIGestureRecognizerDelegate
     
     // allow two simultaneous pan gesture recognizers (mine and the camera's)
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
-
+    
     // MARK: - Setup
     
     private func setupScene() {
@@ -339,15 +342,24 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         cameraNode.constraints = [SCNLookAtConstraint(target: tableNode)]  // point camera at center of table
         scnScene.rootNode.addChildNode(cameraNode)
     }
-    
+
+    private func setupHud() {
+        hud = Hud(size: view.bounds.size)
+        hud.setup()
+        scnView.overlaySKScene = hud
+    }
+
     // MARK: - Utility functions
     
     // get shape node at location provided by tap gesture (nil if none tapped)
     private func getShapeNodeAt(_ location: CGPoint) -> ShapeNode? {
         var shapeNode: ShapeNode?
         let hitResults = scnView.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
+        // hits occur on the lowest-level block nodes (not shape nodes or figure nodes)
         if let result = hitResults.first(where: { $0.node.parent?.name == "Shape" }) {
-            shapeNode = result.node.parent as? ShapeNode
+            if result.node.parent?.parent?.name != "Figure" {  // pws: test... don't move Figure shapes
+                shapeNode = result.node.parent as? ShapeNode
+            }
         }
         return shapeNode
     }
