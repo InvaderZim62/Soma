@@ -12,9 +12,9 @@ import Foundation
 import SpriteKit
 
 struct HudConst {
-    static let labelHeightFraction = 0.75    // distance from bottom / frame height
+    static let labelHeightFraction = 0.73    // distance from bottom / frame height
     static let controlHeightFraction = 0.85  // distance from bottom / frame height
-    static let controlOffsetFraction = 0.15  // distance from sides / frame width
+    static let controlOffsetFraction = 0.16  // distance from sides / frame width
 }
 
 class Hud: SKScene {
@@ -23,7 +23,7 @@ class Hud: SKScene {
     var rightSelectionNode: SKSpriteNode!
     var figureNode: SKSpriteNode!
     
-    var figureNames = ["bed", "bathtub", "bench"]  // must match assets
+    var figureNames = ["ottoman", "sofa", "bench", "bed", "bathtub"]  // must match assets
     
     var figureTextures = [SKTexture]()
     var figureIndex = 0 {
