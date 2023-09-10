@@ -198,7 +198,6 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     // touch is intercepted by hud, which calls this handler
     func handleTouch(hudLocation: CGPoint) {
         let location = CGPoint(x: hudLocation.x, y: scnView.bounds.height - hudLocation.y)  // hud origin: lower left, scene origin: upper left
-        print("SomaVC received hud touch: \(location)")
         if let touchedShapeNode = getShapeNodeAt(location) {
             // shape touched (select it)
             selectedShapeNode = touchedShapeNode
@@ -207,7 +206,6 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     // make tapped shape the selected shape, or rotate about primary axis closest to camera z-axis, if already selected
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
-        print("tap")
         let location = recognizer.location(in: scnView)
         if let tappedShapeNode = getShapeNodeAt(location), let pov = scnView.pointOfView {
             if tappedShapeNode == selectedShapeNode {
@@ -224,7 +222,6 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     // rotate selected shape 90 degrees at a time (vertical pan about primary axis closest
     // to camera x-axis, lateral pan about primary axis closest to camera y-axis)
     @objc func handleSwipe(recognizer: UISwipeGestureRecognizer) {
-        print("swipe")
         if let selectedShapeNode, let pov = scnView.pointOfView {
             var cameraAxis: SCNVector3
             switch recognizer.direction {
@@ -248,12 +245,10 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     // set delta position of shape to delta pan on table or walls (use most perpendicular surface to camera point-of-view)
     @objc func handlePan(recognizer: UIPanGestureRecognizer) {
-        print("pan check")
         if selectedShapeNode == nil {
             recognizer.state = .failed  // force my pan gesture to fail, so camera's pan gesture can take over
             return
         }
-        print("pan")
         let location = recognizer.location(in: scnView)  // absolute 2D screen coordinates
         if let pannedShapeNode = selectedShapeNode {
             switch recognizer.state {

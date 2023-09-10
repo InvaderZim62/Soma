@@ -67,7 +67,6 @@ class Hud: SKScene {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("hud touches began")
         let touch = touches.first!
         let location = touch.location(in: self)
         if leftSelectionNode.contains(location) {
