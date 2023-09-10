@@ -110,10 +110,11 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         createWallNodes()
         createShapeNodes()
         
+        // comment prior five lines and uncomment one of these to create figure image
 //        createFigure(.cube, color: .white)
 //        createFigure(.ottoman, color: .white)
 //        createFigure(.sofa, color: .white)
-//        createFigure(.bench, color: .lightGray)
+//        createFigure(.bench, color: .white)
 //        createFigure(.bed, color: .white)
 //        createFigure(.bathtub, color: .white)
 //        createFigure(.crystal, color: .white)
