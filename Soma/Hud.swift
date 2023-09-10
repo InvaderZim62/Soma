@@ -25,23 +25,23 @@ class Hud: SKScene {
     var rightSelectionNode: SKSpriteNode!
     var figureNode: SKSpriteNode!
     
+    let figureLabel = SKLabelNode(fontNamed: "ChalkboardSE-Regular")
     var figureTextures = [SKTexture]()
     var figureIndex = 0 {
         didSet {
-            figureLabel.text = FigureType.allCases[figureIndex].rawValue
+            let figureType = FigureType.allCases[figureIndex]
+            figureLabel.text = figureType.rawValue
+            figureLabel.position = CGPoint(x: frame.midX + labelOffset(figureType), y: HudConst.labelHeightFraction * frame.height)
             figureNode.texture = figureTextures[figureIndex]
         }
     }
     
     var touchedHudAt: ((CGPoint) -> Void)?  // used to pass touch location to SomaViewController
-    let figureLabel = SKLabelNode(fontNamed: "ChalkboardSE-Regular")
 
     func setup(touchHandler: @escaping (CGPoint) -> Void) {
         touchedHudAt = touchHandler
-        let fontSize = max(frame.height / 34, 13)
         
-        figureLabel.position = CGPoint(x: frame.midX, y: HudConst.labelHeightFraction * frame.height)
-        figureLabel.fontSize = fontSize
+        figureLabel.fontSize = max(frame.height / 34, 13)
         addChild(figureLabel)
 
         leftSelectionNode = SKSpriteNode(imageNamed: "left arrow")
@@ -52,7 +52,7 @@ class Hud: SKScene {
         rightSelectionNode.position = CGPoint(x: (1 - HudConst.controlOffsetFraction) * frame.width, y: HudConst.controlHeightFraction * frame.height)
         addChild(rightSelectionNode)
         
-        figureNode = SKSpriteNode(imageNamed: "bed")
+        figureNode = SKSpriteNode(imageNamed: "cube")
         figureNode.position = CGPoint(x: frame.midX, y: HudConst.controlHeightFraction * frame.height)
         addChild(figureNode)
 
@@ -64,6 +64,22 @@ class Hud: SKScene {
         FigureType.allCases.forEach { figureTextures.append(SKTexture(imageNamed: $0.rawValue)) }
     }
     
+    // horizontal offset in screen points
+    private func labelOffset(_ figureType: FigureType) -> Double {
+        switch figureType {
+        case .sofa:
+            return -25
+        case .cornerstone:
+            return -15
+        case .crystal, .tomb:
+            return 60
+        case .tower:
+            return 70
+        default:
+            return 0
+        }
+    }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touch = touches.first!
         let location = touch.location(in: self)
