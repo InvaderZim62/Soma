@@ -25,7 +25,8 @@ class Hud: SKScene {
     var rightSelectionNode: SKSpriteNode!
     var figureNode: SKSpriteNode!
     
-    var figureNames = ["ottoman", "sofa", "bench", "bed", "bathtub"]  // must match assets
+    var figureNames = ["ottoman", "sofa", "bench", "bed", "bathtub",
+                       "crystal", "tower", "pyramid", "tomb", "cornerstone"]  // must match assets
     
     var figureTextures = [SKTexture]()
     var figureIndex = 0 {

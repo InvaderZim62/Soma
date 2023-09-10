@@ -281,11 +281,7 @@ class FigureNode: SCNNode {
             break
         }
     }
-    //                                                           ◻️      ◻️ <- big blocks are out of page
-    //  ShapeTypes  ◽️         ◽️        ◽️         ◽️◽️       ◽️      ◽️       ◽️
-    //         V: ◽️◽️  L: ◽️◽️◽️  T: ◽️◽️◽️  Z: ◽️◽️    A: ◽️◽️  B:  ◽️◽️  P: ◽️◽️
-    //    origin:    ^        ^           ^          ^          ^        ^       ^◻️
-
+    
     private func addShapeNode(type: ShapeType, position: SCNVector3, rotation: Float = 0, axis: SCNVector3 = SCNVector3Zero, rotation2: Float = 0, axis2: SCNVector3 = SCNVector3Zero) {
         let shapeNode = ShapeNode(type: type)
         shapeNode.position = position * Float(Constants.blockSpacing) + SCNVector3(0, 1, 0)
