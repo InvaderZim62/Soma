@@ -154,10 +154,137 @@ class FigureNode: SCNNode {
             addShapeNode(type: .P, position: SCNVector3(x: 2, y: 1, z: -1),  // green
                          rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: -1),
                          rotation2: .pi/2, axis2: SCNVector3(x: 1, y: 0, z: 0))
+            
+        case .crystal:
+            addShapeNode(type: .V, position: SCNVector3(x: -1, y: 1, z: -1),  // grey
+                         rotation: .pi/2, axis: SCNVector3(x: 1, y: 0, z: 0),
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: 0, z: -1))
+
+            addShapeNode(type: .L, position: SCNVector3(x: 0, y: 0, z: 1),  // brown
+                         rotation: .pi/2, axis: SCNVector3(x: 1, y: 0, z: 0),
+                         rotation2: .pi, axis2: SCNVector3(x: 0, y: 0, z: 1))
+
+            addShapeNode(type: .T, position: SCNVector3(x: 0, y: 0, z: -1),  // tan
+                         rotation: .pi/2, axis: SCNVector3(x: 1, y: 0, z: 0))
+            
+            addShapeNode(type: .Z, position: SCNVector3(x: 1, y: 1, z: 0),  // red
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: -1, z: 0),
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: 0, z: 1))
+
+            addShapeNode(type: .A, position: SCNVector3(x: 0, y: 2, z: 0),  // pink
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: 1),
+                         rotation2: .pi/2, axis2: SCNVector3(x: -1, y: 0, z: 0))
+
+            addShapeNode(type: .B, position: SCNVector3(x: 1, y: 1, z: 1),  // yellow
+                         rotation2: .pi, axis2: SCNVector3(x: 0, y: 1, z: 0))
+            
+            addShapeNode(type: .P, position: SCNVector3(x: 1, y: 3, z: -1),  // green
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: 1))
+            
+        case .tower:
+            addShapeNode(type: .V, position: SCNVector3(x: 1, y: 1, z: 0),  // grey
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: 1),
+                         rotation2: .pi/2, axis2: SCNVector3(x: -1, y: 0, z: 0))
+
+            addShapeNode(type: .L, position: SCNVector3(x: 1, y: 4, z: 0),  // brown
+                         rotation: .pi/2, axis: SCNVector3(x: -1, y: 0, z: 0),
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: -1, z: 0))
+
+            addShapeNode(type: .T, position: SCNVector3(x: 0, y: 4, z: 0),  // tan
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: 1),
+                         rotation2: .pi/2, axis2: SCNVector3(x: -1, y: 0, z: 0))
+
+            addShapeNode(type: .Z, position: SCNVector3(x: 0, y: 3, z: -1),  // red
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: 1),
+                         rotation2: .pi, axis2: SCNVector3(x: 1, y: 0, z: 0))
+
+            addShapeNode(type: .A, position: SCNVector3(x: 1, y: 2, z: 0),  // pink
+                         rotation: .pi/2, axis: SCNVector3(x: 1, y: 0, z: 0),
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: 0, z: 1))
+
+            addShapeNode(type: .B, position: SCNVector3(x: 0, y: 6, z: -1),  // yellow
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: -1))
+
+            addShapeNode(type: .P, position: SCNVector3(x: 0, y: 0, z: -1))  // green
+            
+        case .pyramid:
+            addShapeNode(type: .V, position: SCNVector3(x: 0, y: 1, z: 0),  // grey
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: -1, z: 0))
+            
+            addShapeNode(type: .L, position: SCNVector3(x: 0, y: 0, z: 2),  // brown
+                         rotation: .pi/2, axis: SCNVector3(x: -1, y: 0, z: 0))
+
+            addShapeNode(type: .T, position: SCNVector3(x: -1, y: 0, z: -1),  // tan
+                         rotation: .pi/2, axis: SCNVector3(x: -1, y: 0, z: 0))
+
+            addShapeNode(type: .Z, position: SCNVector3(x: 1, y: 0, z: -2),  // red
+                         rotation: .pi/2, axis: SCNVector3(x: 1, y: 0, z: 0))
+
+            addShapeNode(type: .A, position: SCNVector3(x: 2, y: 0, z: 0),  // pink
+                         rotation: .pi/2, axis: SCNVector3(x: -1, y: 0, z: 0),
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: 0, z: 1))
+
+            addShapeNode(type: .B, position: SCNVector3(x: -2, y: 0, z: 0),  // yellow
+                         rotation: .pi/2, axis: SCNVector3(x: -1, y: 0, z: 0),
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: 0, z: -1))
+
+            addShapeNode(type: .P, position: SCNVector3(x: 0, y: 0, z: 1),  // green
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: 1),
+                         rotation2: .pi/2, axis2: SCNVector3(x: -1, y: 0, z: 0))
+            
+        case .tomb:
+            addShapeNode(type: .V, position: SCNVector3(x: 1, y: 1, z: 1),  // grey
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: 1))
+            
+            addShapeNode(type: .L, position: SCNVector3(x: 1, y: 2, z: 0),  // brown
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: -1),
+                         rotation2: .pi, axis2: SCNVector3(x: 1, y: 0, z: 0))
+
+            addShapeNode(type: .T, position: SCNVector3(x: 1, y: 4, z: 0),  // tan
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 1, z: 0))
+
+            addShapeNode(type: .Z, position: SCNVector3(x: -2, y: 0, z: 0))  // red
+
+            addShapeNode(type: .A, position: SCNVector3(x: -1, y: 1, z: -1),  // pink
+                         rotation: .pi, axis: SCNVector3(x: 0, y: 0, z: 1))
+
+            addShapeNode(type: .B, position: SCNVector3(x: -1, y: 0, z: 1),  // yellow
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: 1),
+                         rotation2: .pi, axis2: SCNVector3(x: 1, y: 0, z: 0))
+
+            addShapeNode(type: .P, position: SCNVector3(x: 1, y: 0, z: -1),  // green
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: 0, z: 1))
+            
+        case .cornerstone:
+            addShapeNode(type: .V, position: SCNVector3(x: -2, y: 0, z: -1))  // grey
+            
+            addShapeNode(type: .L, position: SCNVector3(x: 1, y: 2, z: 0),  // brown
+                         rotation: .pi, axis: SCNVector3(x: 0, y: 0, z: 1),
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: 1, z: 0))
+
+            addShapeNode(type: .T, position: SCNVector3(x: 1, y: 0, z: 0),  // tan
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 1, z: 0))
+
+            addShapeNode(type: .Z, position: SCNVector3(x: 1, y: 1, z: 2),  // red
+                         rotation: .pi, axis: SCNVector3(x: 1, y: 0, z: 0),
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: 1, z: 0))
+
+            addShapeNode(type: .A, position: SCNVector3(x: -1, y: 0, z: -1),  // pink
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: -1))
+
+            addShapeNode(type: .B, position: SCNVector3(x: 0, y: 2, z: -1),  // yellow
+                         rotation: .pi, axis: SCNVector3(x: 0, y: 0, z: 1))
+
+            addShapeNode(type: .P, position: SCNVector3(x: 1, y: 3, z: -1),  // green
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: -1, z: 0))
         default:
             break
         }
     }
+    //                                                           ◻️      ◻️ <- big blocks are out of page
+    //  ShapeTypes  ◽️         ◽️        ◽️         ◽️◽️       ◽️      ◽️       ◽️
+    //         V: ◽️◽️  L: ◽️◽️◽️  T: ◽️◽️◽️  Z: ◽️◽️    A: ◽️◽️  B:  ◽️◽️  P: ◽️◽️
+    //    origin:    ^        ^           ^          ^          ^        ^       ^◻️
 
     private func addShapeNode(type: ShapeType, position: SCNVector3, rotation: Float = 0, axis: SCNVector3 = SCNVector3Zero, rotation2: Float = 0, axis2: SCNVector3 = SCNVector3Zero) {
         let shapeNode = ShapeNode(type: type)

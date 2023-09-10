@@ -28,44 +28,44 @@ class ShapeNode: SCNNode {
     var type = ShapeType.V
     var isHighlighted = false { didSet { updateColor() } }
     
-    var color: UIColor {
-        switch type {
-        case .V:
-            return isHighlighted ? .white : .cyan
-        case .L:
-            return isHighlighted ? .white : .orange
-        case .T:
-            return isHighlighted ? .white : .purple
-        case .Z:
-            return isHighlighted ? .white : .green
-        case .A:
-            return isHighlighted ? .white : .red
-        case .B:
-            return isHighlighted ? .white : .blue
-        case .P:
-            return isHighlighted ? .white : .yellow
-        }
-    }
-    
-//    // wiki colors
 //    var color: UIColor {
 //        switch type {
 //        case .V:
-//            return isHighlighted ? .white : .gray
+//            return isHighlighted ? .white : .cyan
 //        case .L:
-//            return isHighlighted ? .white : .brown
+//            return isHighlighted ? .white : .orange
 //        case .T:
-//            return isHighlighted ? .white : UIColor(red: 240/255, green: 226/255, blue: 179/255, alpha: 1)  // tan
+//            return isHighlighted ? .white : .purple
 //        case .Z:
-//            return isHighlighted ? .white : .red
-//        case .A:
-//            return isHighlighted ? .white : UIColor(red: 237/255, green: 126/255, blue: 164/255, alpha: 1)  // pink
-//        case .B:
-//            return isHighlighted ? .white : .yellow
-//        case .P:
 //            return isHighlighted ? .white : .green
+//        case .A:
+//            return isHighlighted ? .white : .red
+//        case .B:
+//            return isHighlighted ? .white : .blue
+//        case .P:
+//            return isHighlighted ? .white : .yellow
 //        }
 //    }
+    
+    // wiki colors
+    var color: UIColor {
+        switch type {
+        case .V:
+            return isHighlighted ? .white : .gray
+        case .L:
+            return isHighlighted ? .white : .brown
+        case .T:
+            return isHighlighted ? .white : UIColor(red: 240/255, green: 226/255, blue: 179/255, alpha: 1)  // tan
+        case .Z:
+            return isHighlighted ? .white : .red
+        case .A:
+            return isHighlighted ? .white : UIColor(red: 237/255, green: 126/255, blue: 164/255, alpha: 1)  // pink
+        case .B:
+            return isHighlighted ? .white : .yellow
+        case .P:
+            return isHighlighted ? .white : .green
+        }
+    }
 
     init(type: ShapeType) {
         self.type = type

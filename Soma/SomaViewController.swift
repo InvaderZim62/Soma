@@ -112,9 +112,14 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         
 //        createFigure(.ottoman, color: .white)
 //        createFigure(.sofa, color: .white)
-//        createFigure(.bench, color: .lightGray)//.withAlphaComponent(0.3))
+//        createFigure(.bench, color: .lightGray)
 //        createFigure(.bed, color: .white)
 //        createFigure(.bathtub, color: .white)
+//        createFigure(.crystal, color: .white)
+//        createFigure(.tower, color: .white)
+//        createFigure(.pyramid, color: .white)
+//        createFigure(.tomb, color: .white)
+//        createFigure(.cornerstone, color: .white)
 
         // add tap gestures to select shape, or rotate selected shape about screen z-axis
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
@@ -336,7 +341,6 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     private func setupView() {
         scnView = self.view as? SCNView
         scnView.allowsCameraControl = true  // true: allow standard camera controls with panning, false: move camera programmatically
-        scnView.showsStatistics = true
         scnView.autoenablesDefaultLighting = true
         scnView.isPlaying = true  // prevent SceneKit from entering a "paused" state, if there isn't anything to animate
 //        scnView.debugOptions = .showPhysicsShapes  // show bounding boxes and axes
