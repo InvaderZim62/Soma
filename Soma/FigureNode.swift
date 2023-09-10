@@ -8,9 +8,9 @@
 import UIKit
 import SceneKit
 
-enum FigureType {
-    case ottoman, sofa, bench, bed, bathtub
-    case dog, camel, gorilla, scorpion, turtle
+enum FigureType: String, CaseIterable {  // must match assets
+    case cube, ottoman, sofa, bench, bed, bathtub
+//    case dog, camel, gorilla, scorpion, turtle
     case crystal, tower, pyramid, tomb, cornerstone
 }
 
@@ -33,9 +33,40 @@ class FigureNode: SCNNode {
         super.init(coder: coder)
         setup()
     }
+    
+    //                                                           ◻️      ◻️ <- big blocks are out of page
+    //  ShapeTypes  ◽️         ◽️        ◽️         ◽️◽️       ◽️      ◽️       ◽️
+    //         V: ◽️◽️  L: ◽️◽️◽️  T: ◽️◽️◽️  Z: ◽️◽️    A: ◽️◽️  B:  ◽️◽️  P: ◽️◽️
+    //    origin:    ^        ^           ^          ^          ^        ^       ^◻️
 
     func setup() {
         switch type {
+        case .cube:
+            addShapeNode(type: .V, position: SCNVector3(x: 1, y: 1, z: -1),  // grey
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 1, z: 0))
+            
+            addShapeNode(type: .L, position: SCNVector3(x: -1, y: 0, z: 0),  // brown
+                         rotation: .pi/2, axis: SCNVector3(x: -1, y: 0, z: 0),
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: 0, z: -1))
+
+            addShapeNode(type: .T, position: SCNVector3(x: 1, y: 0, z: 0),  // tan
+                         rotation: .pi/2, axis: SCNVector3(x: -1, y: 0, z: 0),
+                         rotation2: .pi/2, axis2: SCNVector3(x: 0, y: 0, z: 1))
+
+            addShapeNode(type: .Z, position: SCNVector3(x: 0, y: 1, z: 0),  // red
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: -1),
+                         rotation2: .pi/2, axis2: SCNVector3(x: -1, y: 0, z: 0))
+
+            addShapeNode(type: .A, position: SCNVector3(x: -1, y: 1, z: -1),  // pink
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 1, z: 0))
+
+            addShapeNode(type: .B, position: SCNVector3(x: 1, y: 1, z: 1),  // yellow
+                         rotation: .pi, axis: SCNVector3(x: 0, y: 1, z: 0))
+
+            addShapeNode(type: .P, position: SCNVector3(x: -1, y: 2, z: 1),  // green
+                         rotation: .pi/2, axis: SCNVector3(x: 0, y: 0, z: -1),
+                         rotation2: .pi/2, axis2: SCNVector3(x: -1, y: 0, z: 0))
+
         case .ottoman:
             addShapeNode(type: .V, position: SCNVector3(x: 0, y: 1, z: 1),  // grey
                          rotation: .pi, axis: SCNVector3(x: 0, y: 0, z: 1))
@@ -277,8 +308,6 @@ class FigureNode: SCNNode {
 
             addShapeNode(type: .P, position: SCNVector3(x: 1, y: 3, z: -1),  // green
                          rotation2: .pi/2, axis2: SCNVector3(x: 0, y: -1, z: 0))
-        default:
-            break
         }
     }
     

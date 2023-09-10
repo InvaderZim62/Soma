@@ -25,13 +25,10 @@ class Hud: SKScene {
     var rightSelectionNode: SKSpriteNode!
     var figureNode: SKSpriteNode!
     
-    var figureNames = ["ottoman", "sofa", "bench", "bed", "bathtub",
-                       "crystal", "tower", "pyramid", "tomb", "cornerstone"]  // must match assets
-    
     var figureTextures = [SKTexture]()
     var figureIndex = 0 {
         didSet {
-            figureLabel.text = figureNames[figureIndex]
+            figureLabel.text = FigureType.allCases[figureIndex].rawValue
             figureNode.texture = figureTextures[figureIndex]
         }
     }
@@ -64,7 +61,7 @@ class Hud: SKScene {
     }
     
     private func loadFigureTextures() {
-        figureNames.forEach { figureTextures.append(SKTexture(imageNamed: $0)) }
+        FigureType.allCases.forEach { figureTextures.append(SKTexture(imageNamed: $0.rawValue)) }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
