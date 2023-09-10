@@ -11,6 +11,14 @@
 //      /
 //     z (blue)
 //
+//  Touch Gesture
+//  -------------
+//  You can't attach gestures to nodes.  Instead, they are added to the view and applied to the "selected shape".  This app uses
+//  touch, tap, swipe, and pan gestures.  Touch is the only one intercepted by the HUD (by default), which sits on top of the
+//  scene's view.  I use a handler to pass the touch location to the view controller.  Several gestures are fired together, but
+//  touch is always fired first.  I use this to "select" a node, if a gesture starts on the node.  This gives the illusion of the
+//  gesture being attached to the node/shape.  The selected shape can then be swiped or panned in one continuous action.
+//
 //  Rotating node about camera axis
 //  -------------------------------
 //  if let pov = scnView.pointOfView {
@@ -80,13 +88,9 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     var shapeNodes = [String: ShapeNode]()  // [ShapeType: ShapeNode]
     var selectedShapeNode: ShapeNode? {
         didSet {
-            pastSelectedShapeNode?.isHighlighted = false
-            selectedShapeNode?.isHighlighted = true
-            pastSelectedShapeNode = selectedShapeNode
             scnView.allowsCameraControl = selectedShapeNode == nil
         }
     }
-    var pastSelectedShapeNode: ShapeNode?
     var startingPositions = [SCNVector3]()
     var initialTableCoordinates = SCNVector3Zero  // used in handlePan
     var initialShapePosition = SCNVector3Zero
@@ -185,15 +189,25 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private func createFigure(_ type: FigureType, color: UIColor? = nil) {
         let figureNode = FigureNode(type: type, color: color)
-//        figureNode.position = SCNVector3(x: 0, y: 6, z: 0)  // float figure above board
-//        figureNode.scale = SCNVector3(x: 1, y: 1, z: 1) * 0.4  // shrink figure
         scnScene.rootNode.addChildNode(figureNode)
     }
 
     // MARK: - Gesture Recognizers
     
+    // select shape, if any gesture begins on it (touch is always called first);
+    // touch is intercepted by hud, which calls this handler
+    func handleTouch(hudLocation: CGPoint) {
+        let location = CGPoint(x: hudLocation.x, y: scnView.bounds.height - hudLocation.y)  // hud origin: lower left, scene origin: upper left
+        print("SomaVC received hud touch: \(location)")
+        if let touchedShapeNode = getShapeNodeAt(location) {
+            // shape touched (select it)
+            selectedShapeNode = touchedShapeNode
+        }
+    }
+    
     // make tapped shape the selected shape, or rotate about primary axis closest to camera z-axis, if already selected
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
+        print("tap")
         let location = recognizer.location(in: scnView)
         if let tappedShapeNode = getShapeNodeAt(location), let pov = scnView.pointOfView {
             if tappedShapeNode == selectedShapeNode {
@@ -202,19 +216,15 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
                 let cameraAxis = recognizer.numberOfTapsRequired == 1 ? pov.worldFront : -pov.worldFront
                 let shapeAxis = scnScene.rootNode.convertVector(cameraAxis, to: selectedShapeNode)
                 rotateNode(tappedShapeNode, aboutAxis: shapeAxis.closestPrimaryDirection)
-            } else {
-                // new shape tapped (select it)
-                selectedShapeNode = tappedShapeNode
             }
-        } else {
-            // no shape tapped (deselect all)
-            selectedShapeNode = nil
         }
+        selectedShapeNode = nil
     }
     
     // rotate selected shape 90 degrees at a time (vertical pan about primary axis closest
     // to camera x-axis, lateral pan about primary axis closest to camera y-axis)
     @objc func handleSwipe(recognizer: UISwipeGestureRecognizer) {
+        print("swipe")
         if let selectedShapeNode, let pov = scnView.pointOfView {
             var cameraAxis: SCNVector3
             switch recognizer.direction {
@@ -233,14 +243,17 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
             let shapeAxis = scnScene.rootNode.convertVector(cameraAxis, to: selectedShapeNode)
             rotateNode(selectedShapeNode, aboutAxis: shapeAxis.closestPrimaryDirection)
         }
+        selectedShapeNode = nil
     }
-
-    // set delta position of shape to delta pan (finger doesn't have to start on shape)
+    
+    // set delta position of shape to delta pan on table or walls (use most perpendicular surface to camera point-of-view)
     @objc func handlePan(recognizer: UIPanGestureRecognizer) {
+        print("pan check")
         if selectedShapeNode == nil {
             recognizer.state = .failed  // force my pan gesture to fail, so camera's pan gesture can take over
             return
         }
+        print("pan")
         let location = recognizer.location(in: scnView)  // absolute 2D screen coordinates
         if let pannedShapeNode = selectedShapeNode {
             switch recognizer.state {
@@ -259,6 +272,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
             case .ended, .cancelled:
                 // when done moving, snap to nearest point by setting deadband = half range
                 pannedShapeNode.position = snap3D(pannedShapeNode.position, to: Constants.blockSpacing, deadband: Constants.blockSpacing / 2, offset: 0)
+                selectedShapeNode = nil
             default:
                 break
             }
@@ -344,8 +358,8 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     private func setupHud() {
-        hud = Hud(size: view.bounds.size)
-        hud.setup()
+        hud = Hud(size: scnView.bounds.size)
+        hud.setup(touchHandler: handleTouch)
         scnView.overlaySKScene = hud
     }
 

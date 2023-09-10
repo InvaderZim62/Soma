@@ -7,6 +7,8 @@
 //  Hud is set up in SomaViewController.setupHud to take up the whole screen.  Hud has left and right
 //  arrow nodes to cycle through images of the completed figures.
 //
+//  Since Hud intercepts touches, a handler is called if touch is not on an arrow.
+//
 
 import Foundation
 import SpriteKit
@@ -32,10 +34,12 @@ class Hud: SKScene {
             figureNode.texture = figureTextures[figureIndex]
         }
     }
-
+    
+    var touchedHudAt: ((CGPoint) -> Void)?  // used to pass touch location to SomaViewController
     let figureLabel = SKLabelNode(fontNamed: "ChalkboardSE-Regular")
 
-    func setup() {
+    func setup(touchHandler: @escaping (CGPoint) -> Void) {
+        touchedHudAt = touchHandler
         let fontSize = max(frame.height / 34, 13)
         
         figureLabel.position = CGPoint(x: frame.midX, y: HudConst.labelHeightFraction * frame.height)
@@ -63,6 +67,7 @@ class Hud: SKScene {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        print("hud touches began")
         let touch = touches.first!
         let location = touch.location(in: self)
         if leftSelectionNode.contains(location) {
@@ -70,6 +75,8 @@ class Hud: SKScene {
             figureIndex = remainder >= 0 ? remainder : remainder + figureTextures.count  // needed for modulo of negative numbers
         } else if rightSelectionNode.contains(location) {
             figureIndex = (figureIndex + 1) % figureTextures.count
+        } else {
+            touchedHudAt?(location)
         }
     }
 }
