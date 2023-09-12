@@ -71,7 +71,7 @@ struct Constants {
     static let tableSize: CGFloat = 12 * blockSpacing
     static let tableThickness: CGFloat = 0.25
     static let cameraDistance: Float = 23 * Float(Constants.blockSpacing)
-    static let createImages = false  // set false, for app release
+    static let createImages = true  // set false, for app release
 }
 
 enum WallType: String {
@@ -96,6 +96,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     var initialTableCoordinates = SCNVector3Zero  // used in handlePan
     var initialShapePosition = SCNVector3Zero
     var figureImageNode: FigureNode!
+    var figureImageIndex = 0
 
     override var prefersStatusBarHidden: Bool {
         return true
@@ -107,17 +108,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         setupView()
         setupCamera()
         if Constants.createImages {
-            figureImageNode = createFigureForImage(.cube)
-//        createFigureForImage(.ottoman)
-//        createFigureForImage(.sofa)
-//        createFigureForImage(.bench)
-//        createFigureForImage(.bed)
-//        createFigureForImage(.bathtub)
-//        createFigureForImage(.crystal)
-//        createFigureForImage(.tower)
-//        createFigureForImage(.pyramid)
-//        createFigureForImage(.tomb)
-//        createFigureForImage(.cornerstone)
+            figureImageNode = createFigureForImage(FigureType.allCases[figureImageIndex])
         } else {
             setupHud()
             startingPositions = getEvenlySpacedCircularPoints(number: ShapeType.allCases.count, radius: 0.4 * Constants.tableSize)
@@ -218,7 +209,15 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     // make tapped shape the selected shape, or rotate about primary axis closest to camera z-axis, if already selected
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
         if Constants.createImages {
-            figureImageNode.isHighlighted.toggle()
+            if recognizer.numberOfTapsRequired == 1 {
+                // single-tap toggles color
+                figureImageNode.isHighlighted.toggle()
+            } else {
+                // double-tap cycles figures
+                figureImageIndex = (figureImageIndex + 1) % FigureType.allCases.count
+                figureImageNode.removeFromParentNode()
+                figureImageNode = createFigureForImage(FigureType.allCases[figureImageIndex])
+            }
         }
         let location = recognizer.location(in: scnView)
         if let tappedShapeNode = getShapeNodeAt(location), let pov = scnView.pointOfView {
