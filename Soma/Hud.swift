@@ -30,6 +30,7 @@ class Hud: SKScene {
     var figureIndex = 0 {
         didSet {
             figureNode.texture = figureTexturesWhite[figureIndex]
+            figureLabel.position = CGPoint(x: frame.midX + labelOffset, y: HudConst.labelHeightFraction * frame.height)
             figureLabel.text = FigureType.allCases[figureIndex].rawValue
         }
     }
@@ -48,11 +49,11 @@ class Hud: SKScene {
         case .sofa:
             return -25
         case .cornerstone:
-            return -15
-        case .crystal, .tomb:
+            return -10
+        case .ottoman, .bench:
+            return 15
+        case .crystal, .tomb, .tower:
             return 60
-        case .tower:
-            return 70
         default:
             return 0
         }
@@ -64,7 +65,6 @@ class Hud: SKScene {
         touchedHudAt = touchHandler
         
         figureLabel.fontSize = max(frame.height / 34, 13)
-        figureLabel.position = CGPoint(x: frame.midX + labelOffset, y: HudConst.labelHeightFraction * frame.height)
         addChild(figureLabel)
 
         leftSelectionNode = SKSpriteNode(imageNamed: "left arrow")
