@@ -3,6 +3,10 @@
 Soma is comprised of seven shapes that can be fitted together to make many differrent figures.  The primary figure is
 a cube.  It's much easier to work with real blocks, but I looked at this SceneKit app as a challenge in user interface.
 
+![Soma1](https://github.com/InvaderZim62/Soma/assets/34785252/9ea5a03b-7907-4642-83c6-ea7226522c56)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+![Soma2](https://github.com/InvaderZim62/Soma/assets/34785252/2fd83193-fe01-4e16-b10d-a104a23b0384)
+
 The app demonstrates the following features:
 * Combining pan gesture with standard camera controls
 * Combining pan and swipe gestures
@@ -34,7 +38,7 @@ In SceneKit, you can't add gestures to nodes.  Instead, you add them to the scen
 however, where you want to apply a gesture to a node, if it starts on the node.
 
 This app allows the user to manipulate a shape using the pan and swipe gestures, if those gestures starts with your
-finger on the shape.  If the pan gestue starts with your finger off of any shape, the app rotates the camera's point
+finger on the shape.  If the pan gesture starts with your finger off of any shape, the app rotates the camera's point
 of view.  This is accomplished using the touch gesture, which is called before every other gesture.  If the touch
 starts on a shape, that shape is designated the "selected shape", otherwise the selected shape is set to nil.  The
 pan and swipe gestures are only applied to the "selected shape", if there is one.
