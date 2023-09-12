@@ -16,17 +16,16 @@ enum FigureType: String, CaseIterable {  // must match assets
 
 class FigureNode: SCNNode {
     
-    var type = FigureType.ottoman
-    var color: UIColor?
+    var type = FigureType.cube
+    var isHighlighted = false { didSet { updateColor() } }  // whole figure is white, if highlighted
 
-    init(type: FigureType, color: UIColor? = nil) {
-        self.type = type
-        if let color {
-            self.color = color
-        }
+    init(type: FigureType, isHighlighted: Bool) {
         super.init()
         name = "Figure"
+        self.type = type  // call before setup
         setup()
+        self.isHighlighted = isHighlighted  // call after setup
+        updateColor()
     }
     
     required init?(coder: NSCoder) {
@@ -316,9 +315,14 @@ class FigureNode: SCNNode {
         shapeNode.position = position * Float(Constants.blockSpacing) + SCNVector3(0, 1, 0)
         shapeNode.transform = SCNMatrix4Rotate(shapeNode.transform, rotation, axis.x, axis.y, axis.z)
         shapeNode.transform = SCNMatrix4Rotate(shapeNode.transform, rotation2, axis2.x, axis2.y, axis2.z)
-        if let color {
-            shapeNode.setColorTo(color)
-        }
         addChildNode(shapeNode)
+    }
+    
+    private func updateColor() {
+        for childNode in childNodes {
+            if let shapeNode = childNode as? ShapeNode {
+                shapeNode.isHighlighted = isHighlighted
+            }
+        }
     }
 }

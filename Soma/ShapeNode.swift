@@ -135,11 +135,11 @@ class ShapeNode: SCNNode {
         }
     }
     
-    func setColorTo(_ color: UIColor) {
-        for childNode in childNodes {
-            if let blockNode = childNode as? BlockNode {
-                blockNode.setColorTo(color)
-            }
-        }
-    }
+//    func setColorTo(_ color: UIColor) {
+//        for childNode in childNodes {
+//            if let blockNode = childNode as? BlockNode {
+//                blockNode.setColorTo(color)
+//            }
+//        }
+//    }
 }

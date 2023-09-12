@@ -71,6 +71,7 @@ struct Constants {
     static let tableSize: CGFloat = 12 * blockSpacing
     static let tableThickness: CGFloat = 0.25
     static let cameraDistance: Float = 23 * Float(Constants.blockSpacing)
+    static let createImages = false  // set false, for app release
 }
 
 enum WallType: String {
@@ -94,6 +95,7 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     var startingPositions = [SCNVector3]()
     var initialTableCoordinates = SCNVector3Zero  // used in handlePan
     var initialShapePosition = SCNVector3Zero
+    var figureImageNode: FigureNode!
 
     override var prefersStatusBarHidden: Bool {
         return true
@@ -104,24 +106,25 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         setupScene()
         setupView()
         setupCamera()
-        setupHud()
-        startingPositions = getEvenlySpacedCircularPoints(number: ShapeType.allCases.count, radius: 0.4 * Constants.tableSize)
-        createTableNode()
-        createWallNodes()
-        createShapeNodes()
-        
-        // comment prior five lines and uncomment one of these to create figure image
-//        createFigure(.cube, color: .white)
-//        createFigure(.ottoman, color: .white)
-//        createFigure(.sofa, color: .white)
-//        createFigure(.bench, color: .white)
-//        createFigure(.bed, color: .white)
-//        createFigure(.bathtub, color: .white)
-//        createFigure(.crystal, color: .white)
-//        createFigure(.tower, color: .white)
-//        createFigure(.pyramid, color: .white)
-//        createFigure(.tomb, color: .white)
-//        createFigure(.cornerstone, color: .white)
+        if Constants.createImages {
+            figureImageNode = createFigureForImage(.cube)
+//        createFigureForImage(.ottoman)
+//        createFigureForImage(.sofa)
+//        createFigureForImage(.bench)
+//        createFigureForImage(.bed)
+//        createFigureForImage(.bathtub)
+//        createFigureForImage(.crystal)
+//        createFigureForImage(.tower)
+//        createFigureForImage(.pyramid)
+//        createFigureForImage(.tomb)
+//        createFigureForImage(.cornerstone)
+        } else {
+            setupHud()
+            startingPositions = getEvenlySpacedCircularPoints(number: ShapeType.allCases.count, radius: 0.4 * Constants.tableSize)
+            createTableNode()
+            createWallNodes()
+            createShapeNodes()
+        }
 
         // add tap gestures to select shape, or rotate selected shape about screen z-axis
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
@@ -194,9 +197,10 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    private func createFigure(_ type: FigureType, color: UIColor? = nil) {
-        let figureNode = FigureNode(type: type, color: color)
+    private func createFigureForImage(_ type: FigureType) -> FigureNode {
+        let figureNode = FigureNode(type: type, isHighlighted: true)
         scnScene.rootNode.addChildNode(figureNode)
+        return figureNode
     }
 
     // MARK: - Gesture Recognizers
@@ -213,6 +217,9 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     // make tapped shape the selected shape, or rotate about primary axis closest to camera z-axis, if already selected
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
+        if Constants.createImages {
+            figureImageNode.isHighlighted.toggle()
+        }
         let location = recognizer.location(in: scnView)
         if let tappedShapeNode = getShapeNodeAt(location), let pov = scnView.pointOfView {
             if tappedShapeNode == selectedShapeNode {
