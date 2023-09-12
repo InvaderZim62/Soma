@@ -67,11 +67,11 @@ import SceneKit
 
 struct Constants {
     static let blockSpacing: CGFloat = 1
-    static let blockSize: CGFloat = 0.97 * Constants.blockSpacing  // slightly smaller, to prevent continuous contact detection (not yet used)
+    static let blockSize: CGFloat = 0.97 * Constants.blockSpacing  // slightly smaller, to prevent continuous contact detection (if used)
     static let tableSize: CGFloat = 12 * blockSpacing
     static let tableThickness: CGFloat = 0.25
     static let cameraDistance: Float = 23 * Float(Constants.blockSpacing)
-    static let createImages = true  // set false, for app release
+    static let createImages = false  // true: create figure in middle of screen for screen capture
 }
 
 enum WallType: String {
@@ -101,6 +101,8 @@ class SomaViewController: UIViewController, UIGestureRecognizerDelegate {
     override var prefersStatusBarHidden: Bool {
         return true
     }
+    
+    // MARK: - Start of code
 
     override func viewDidLoad() {
         super.viewDidLoad()
