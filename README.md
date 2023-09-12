@@ -12,6 +12,7 @@ The app demonstrates the following features:
 * Combining pan gesture with standard camera controls
 * Combining pan and swipe gestures
 * Making it appear that gesures are attached to nodes
+* Panning nodes in three dimensions
 
 ## Combining pan gesture with standard camera controls
 
@@ -48,3 +49,12 @@ off of any shape, the app rotates the camera's point of view.  This is accomplis
 the touch gesture, which is called before every other gesture.  If the touch starts on a
 shape, that shape is designated the "selected shape", otherwise the selected shape is set to
 nil.  The pan and swipe gestures are only applied to the "selected shape", if there is one.
+
+## Panning nodes in three dimensions
+
+The scene includes two clear planes that are perpendicular to the x- and z-axes.  In order
+to pan a shape in three dimensions, I determine which plane is most perpendicular to the
+camera's point of view, and use is to convert screen position to scene coordinates.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+![soma3](https://github.com/InvaderZim62/Soma/assets/34785252/4bfd80e1-080c-44d8-a2c2-d26a1e08882a)
