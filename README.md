@@ -8,7 +8,7 @@ The app demonstrates the following features:
 2. Combining pan and swipe gestures
 3. Making it appear that gesures are attached to nodes
 
-## 1. Combining pan gesture with standard camera controls
+### 1. Combining pan gesture with standard camera controls
 
 This app uses pan gestures to move shapes around the scene and to rotate the camera's point of view.  Normally, if you
 add a pan gesture to the scene, the standard camera controls are automatically disabled.  To get around this, you have
@@ -19,7 +19,7 @@ to do five things:
 4. Require your pan gesture to fail before the camera pan gesture gets invoked using cameraPanGesture.require(toFail: pan)
 5. Programmatically fail your pan gesture, when you want to use the camera controls
 
-## 2. Combining pan and swipe gestures
+### 2. Combining pan and swipe gestures
 
 This app uses pan gestures to move shapes around the scene, and swipe gestures to rotate shapes about their vertical or
 horizontal axes (tap gestues are used to rotate about the point of view).  Normally, if you include both pan and swipe
@@ -28,7 +28,7 @@ swipe gestures to fail before the pan gesture gets invoked:
 * pan.require(toFail: swipeUp)
 * pan.require(toFail: swipeRight)...
 
-## 3. Making it appear that gesures are attached to nodes
+### 3. Making it appear that gesures are attached to nodes
 
 In SceneKit, you can't add gestures to nodes.  Instead, you add them to the scene's view.  There are many cases
 however, where you want to apply a gesture to a node, if it starts on the node.
