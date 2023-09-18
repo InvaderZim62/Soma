@@ -29,7 +29,7 @@ controls are automatically disabled.  To get around this, you have to do five th
 ## Combining pan and swipe gestures
 
 This app uses pan gestures to move shapes around the scene, and swipe gestures to rotate
-shapes about their vertical or horizontal axes (tap gestues are used to rotate about the
+shapes about their vertical or horizontal axes (tap gestures are used to rotate about the
 point of view).  Normally, if you include both pan and swipe gestures, both gesture's
 selectors gets called.  To separate the two, you must use lines like these, to require
 the swipe gestures to fail before the pan gesture gets invoked:
