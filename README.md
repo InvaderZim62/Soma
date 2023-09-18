@@ -1,7 +1,8 @@
 # Soma
 
-Soma is comprised of seven shapes that can be fitted together to make many differrent figures.  The primary figure is
-a cube.  It's much easier to work with real blocks, but I looked at this SceneKit app as a challenge in user interface.
+Soma is a puzzle made up of seven shapes that can be fitted together to make many differrent figures.  The primary
+figure is a cube.  It's much easier to work with real blocks, but I looked at this app as a challenge in user interface
+using SceneKit.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 ![Soma1](https://github.com/InvaderZim62/Soma/assets/34785252/9ea5a03b-7907-4642-83c6-ea7226522c56)
